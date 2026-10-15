@@ -14,7 +14,7 @@
     <description lang="en_GB">Kodi Utilities</description>
     <platform>all</platform><license>MIT</license>
   </extension>
-</addon><addon id="service.cinema.controls" name="Cinema Controls" version="0.1.1" provider-name="Kodi Utilities">
+</addon><addon id="service.cinema.controls" name="Cinema Controls" version="0.1.2" provider-name="Kodi Utilities">
   <requires><import addon="xbmc.python" version="3.0.1" /><import addon="plugin.video.jellyfin" version="1.0.0" /></requires>
   <extension point="xbmc.service" library="service.py" />
   <extension point="xbmc.addon.metadata">
