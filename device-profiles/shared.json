@@ -1,17 +1,12 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 2,
+  "revision": 1,
   "changes": [
     {
       "type": "kodi_setting",
       "id": "screensaver.mode",
       "value": ""
-    },
-    {
-      "type": "kodi_setting",
-      "id": "screensaver.usedimonpause",
-      "value": false
     }
   ]
 }
