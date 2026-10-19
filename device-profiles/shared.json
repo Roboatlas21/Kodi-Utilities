@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 4,
+  "revision": 5,
   "changes": [
     {
       "type": "kodi_setting",
@@ -37,6 +37,24 @@
       "type": "file_source",
       "name": "Jurialmunkey Repo",
       "path": "https://jurialmunkey.github.io/repository.jurialmunkey/"
+    },
+    {
+      "type": "addon_setting",
+      "addon_id": "plugin.video.jellyfin",
+      "id": "enableCinema",
+      "value": true
+    },
+    {
+      "type": "addon_setting",
+      "addon_id": "plugin.video.jellyfin",
+      "id": "mediaSegmentsEnabled",
+      "value": true
+    },
+    {
+      "type": "addon_setting",
+      "addon_id": "plugin.video.jellyfin",
+      "id": "skipRecapMode",
+      "value": 2
     }
   ]
 }
