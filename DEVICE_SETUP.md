@@ -1,10 +1,10 @@
-# Kodi Utilities — Device Setup (0.1.0)
+# Kodi Utilities — Device Setup (0.1.2)
 
 Manual CoreELEC 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
 ## Settings policy
 
-- The public profile `device-profiles/shared.json` **starts empty**, with `"changes": []`.
+- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. It currently contains the single approved `screensaver.mode` = `""` (None) setting, applied only after confirmation.
 - Installing the add-on, opening it, and checking updates **never modify any Kodi settings**.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
@@ -19,7 +19,7 @@ Manual CoreELEC 22 / Kodi configuration replication through the existing Kodi Ut
 1. Install the existing Kodi Utilities repository on a box.
 2. Choose **Kodi Utilities - Device Setup** from that repository.
 3. Open it from Kodi's **Program add-ons**.
-4. Choose **Preview GitHub Changes**. The initial shared profile shows **No changes**.
+4. Choose **Quick Settings → Device name** to edit this box’s Kodi network-advertised name, or **Preview GitHub Changes** to inspect shared configuration changes.
 5. When you have asked AI to modify the public profile, use **Apply My Setup** after reading the exact changes.
 
 Repository profile URL: https://raw.githubusercontent.com/Roboatlas21/Kodi-Utilities/main/device-profiles/shared.json
@@ -44,3 +44,10 @@ Allowed operation objects (examples only; nothing below is active):
 - Display resolution, audio passthrough, CEC, HDR-to-SDR and authentication should stay device-local unless you specifically approve each one.
 - Kodi repository add-on updates and GitHub configuration updates are independent.
 - Developer tests ran locally with mocked Kodi APIs; **not yet tested on physical CoreELEC 22 hardware**.
+
+## Quick Settings (v0.1.2)
+
+- **Device name**: read the current `services.devicename` value from this Kodi box, then open the Kodi keyboard with that name prefilled. Confirming a new, nonblank name changes only the current Kodi box; Cancel, no-op, or blank input makes no change.
+- Quick Settings is fully **local**: it does not fetch or modify the GitHub shared profile, and the shared-profile Restore Previous Settings does not roll back Quick Settings edits.
+- This changes Kodi’s network-advertised name, not necessarily the CoreELEC operating-system hostname.
+- Other editable shortcuts will be added only when specifically approved.
