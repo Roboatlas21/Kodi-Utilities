@@ -1,12 +1,32 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 1,
+  "revision": 2,
   "changes": [
     {
       "type": "kodi_setting",
       "id": "screensaver.mode",
       "value": ""
+    },
+    {
+      "type": "kodi_setting",
+      "id": "filecache.buffermode",
+      "value": 1
+    },
+    {
+      "type": "kodi_setting",
+      "id": "filecache.memorysize",
+      "value": 512
+    },
+    {
+      "type": "kodi_setting",
+      "id": "filecache.readfactor",
+      "value": 400
+    },
+    {
+      "type": "kodi_setting",
+      "id": "filecache.chunksize",
+      "value": 262144
     }
   ]
 }
