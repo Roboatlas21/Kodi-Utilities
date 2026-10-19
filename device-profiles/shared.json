@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 2,
+  "revision": 3,
   "changes": [
     {
       "type": "kodi_setting",
@@ -27,6 +27,11 @@
       "type": "kodi_setting",
       "id": "filecache.chunksize",
       "value": 262144
+    },
+    {
+      "type": "file_source",
+      "name": "Jellyfin Repo",
+      "path": "https://kodi.jellyfin.org/"
     }
   ]
 }
