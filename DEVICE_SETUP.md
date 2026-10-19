@@ -1,10 +1,10 @@
-# Kodi Utilities — Device Setup (0.1.3)
+# Kodi Utilities — Device Setup (0.1.4)
 
 Manual CoreELEC 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
 ## Settings policy
 
-- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, 4x, 256 KB), and the Jellyfin File Manager source. All are applied only after confirmation.
+- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, 4x, 256 KB), and two File Manager sources (Jellyfin and Jurialmunkey). All are applied only after confirmation.
 - Installing the add-on, opening it, and checking updates **never modify any Kodi settings**.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
@@ -54,7 +54,7 @@ Allowed operation objects (examples only; nothing below is active):
 
 ## File Manager source — Jellyfin Repo (v0.1.3)
 
-The user-approved shared profile includes this one operation:
+The user-approved shared profile includes the following Jellyfin operation:
 ```json
 {"type":"file_source","name":"Jellyfin Repo","path":"https://kodi.jellyfin.org/"}
 ```
@@ -64,6 +64,20 @@ The user-approved shared profile includes this one operation:
 - Select **Jellyfin Repo → repository.jellyfin.kodi.zip** manually to install Jellyfin's official add-on repository.
 - Existing source entries and other sections are preserved. An identical URL is not duplicated, even if installed under another name. A conflicting `Jellyfin Repo` source name with a different URL or malformed XML aborts before any changes.
 - The add-on makes a local backup of the existing `sources.xml` before editing. **Restore Previous Settings** can remove its unchanged new entry, but will not delete a source later edited by the user.
-- Only the exact approved HTTPS address and source name are accepted in GitHub's public profile.
+- File Manager source entries must use safe public HTTPS URLs without embedded credentials; only explicitly approved entries added to the shared GitHub profile are applied.
 - Source-file changes are scoped to the **default/master Kodi profile** on CoreELEC, not alternate multi-user Kodi profiles; multi-user installations should verify their File Manager sources manually.
 - This functionality was covered by mocked Kodi/local filesystem tests, **not yet verified on the Ugoos AM6B+ running CoreELEC 22**.
+
+## File Manager source — Jurialmunkey Repo (v0.1.4)
+
+This release adds the explicitly requested File Manager source to the existing shared profile:
+
+```json
+{"type":"file_source","name":"Jurialmunkey Repo","path":"https://jurialmunkey.github.io/repository.jurialmunkey/"}
+```
+
+- The installer ZIP remains **manual**, as requested: Kodi → Add-ons → Install from zip file → Jurialmunkey Repo → `repository.jurialmunkey-3.4.zip` (or the available version).
+- The source is a shortcut only; applying the profile does **not** install Jurialmunkey's repository, Arctic Fuse 3, Arctic Horizon 2, or enable Unknown Sources.
+- The Jellyfin source and the five previously approved Kodi settings remain unchanged.
+- Kodi may require a restart before File Manager displays the new source. No source is added if the URL already exists.
+- Future public HTTPS File Manager sources can be added solely by updating the approved JSON profile; a separate add-on release is not required.
