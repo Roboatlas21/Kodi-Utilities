@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 5,
+  "revision": 6,
   "changes": [
     {
       "type": "kodi_setting",
@@ -21,7 +21,7 @@
     {
       "type": "kodi_setting",
       "id": "filecache.readfactor",
-      "value": 400
+      "value": 0
     },
     {
       "type": "kodi_setting",
