@@ -1,10 +1,10 @@
-# Kodi Utilities — Device Setup (0.1.4)
+# Kodi Utilities — Device Setup (0.1.5)
 
 Manual CoreELEC 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
 ## Settings policy
 
-- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, 4x, 256 KB), and two File Manager sources (Jellyfin and Jurialmunkey). All are applied only after confirmation.
+- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), and three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button). All are applied only after confirmation.
 - Installing the add-on, opening it, and checking updates **never modify any Kodi settings**.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
@@ -81,3 +81,12 @@ This release adds the explicitly requested File Manager source to the existing s
 - The Jellyfin source and the five previously approved Kodi settings remain unchanged.
 - Kodi may require a restart before File Manager displays the new source. No source is added if the URL already exists.
 - Future public HTTPS File Manager sources can be added solely by updating the approved JSON profile; a separate add-on release is not required.
+
+## Optional add-on settings (v0.1.5)
+
+- **Apply My Setup** skips only settings belonging to add-ons that Kodi reports as **not installed**. It still previews and applies available approved Kodi, skin, File Manager source, and other add-on changes, after confirmation. It never installs a missing add-on automatically.
+- The preview and completion dialog identify the missing add-on and the number of settings skipped (for example, `plugin.video.jellyfin not installed — 3 settings skipped`). If only missing add-on settings remain, no settings or prior rollback snapshots are changed.
+- After installing the add-on, run **Apply My Setup** again to apply the previously skipped settings. The shared GitHub configuration remains unchanged.
+- **Restore Previous Settings** skips add-on settings if their add-on has since been uninstalled, restores other eligible settings, and retains pending rollback entries for the missing add-on. It will still refuse to overwrite values independently modified since Apply.
+- Errors unrelated to a missing add-on still stop the operation; they are not silently ignored.
+- Verified by 20 Kodi-mocked regression tests, including missing add-ons, late uninstall, retry, File Manager source preservation, and restore. Physical CoreELEC 21/22 testing is still pending.
