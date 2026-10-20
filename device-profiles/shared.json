@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 6,
+  "revision": 7,
   "changes": [
     {
       "type": "kodi_setting",
@@ -55,6 +55,16 @@
       "addon_id": "plugin.video.jellyfin",
       "id": "skipRecapMode",
       "value": 2
+    },
+    {
+      "type": "cec_setting",
+      "id": "standby_pc_on_tv_standby",
+      "value": 36044
+    },
+    {
+      "type": "cec_setting",
+      "id": "pause_or_stop_playback_on_deactivate",
+      "value": 36044
     }
   ]
 }

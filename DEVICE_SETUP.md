@@ -1,4 +1,4 @@
-# Kodi Utilities — Device Setup (0.1.5)
+# Kodi Utilities — Device Setup (0.1.6)
 
 Manual CoreELEC 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
@@ -41,7 +41,7 @@ Allowed operation objects (examples only; nothing below is active):
 
 - Kodi 22's JSON-RPC `Settings.GetSkinSettingValue` and `Settings.SetSkinSettingValue` are used for the *active* skin only. Confirm these APIs on the installed CoreELEC 22 build.
 - Full Arctic Fuse 3 hubs/widgets may require later targeted support. Copying a full skin settings directory is intentionally unsupported.
-- Display resolution, audio passthrough, CEC, HDR-to-SDR and authentication should stay device-local unless you specifically approve each one.
+- Display resolution, audio passthrough, HDR-to-SDR and authentication remain device-local unless explicitly approved. The only shared HDMI-CEC operations allowed are the two Stop Playback actions listed below.
 - Kodi repository add-on updates and GitHub configuration updates are independent.
 - Developer tests ran locally with mocked Kodi APIs; **not yet tested on physical CoreELEC 22 hardware**.
 
@@ -90,3 +90,18 @@ This release adds the explicitly requested File Manager source to the existing s
 - **Restore Previous Settings** skips add-on settings if their add-on has since been uninstalled, restores other eligible settings, and retains pending rollback entries for the missing add-on. It will still refuse to overwrite values independently modified since Apply.
 - Errors unrelated to a missing add-on still stop the operation; they are not silently ignored.
 - Verified by 20 Kodi-mocked regression tests, including missing add-ons, late uninstall, retry, File Manager source preservation, and restore. Physical CoreELEC 21/22 testing is still pending.
+
+## HDMI-CEC Stop Playback support (v0.1.6)
+
+The approved shared profile (revision 7) requests exactly two HDMI-CEC options:
+
+- **When the TV is switched off** — Stop Playback (setting `standby_pc_on_tv_standby`, value `36044`)
+- **Action when switching to another source** — Stop Playback (setting `pause_or_stop_playback_on_deactivate`, value `36044`)
+
+These are peripheral CEC settings, not normal Kodi JSON-RPC settings. The add-on uses the read-only system CEC definition to check availability, and reads one uniquely identified saved CEC adapter configuration under the current Kodi profile. It skips settings that are absent or not yet saved, including the source-switch setting omitted from stock CoreELEC 22. It never edits CoreELEC's read-only system file or installs the upstream CEC fix. When CoreELEC makes the setting available, the user must manually run **Apply My Setup** again; updates never automatically apply settings.
+
+Applying available CEC changes requires explicit confirmation. Kodi then briefly restarts: an independent systemd timer stops Kodi, verifies that the saved CEC values still match the preview, saves a copy, updates only the approved values, and starts Kodi again. A changed value or ambiguous adapter file fails closed; the helper still attempts to restart Kodi. If no CEC changes are available, no restart is scheduled. A normal Kodi update/install never triggers the helper.
+
+**Restore Previous Settings** can schedule another Kodi restart to restore the prior CEC values, provided the user has not independently changed those settings. The existing preview, missing-addon skipping, and non-CEC operations remain supported. Restart results are recorded under Kodi's `addon_data/script.kodi.utilities.setup` folder as `cec_job.status` and `cec_job.log`; use **Check for Updates** to see whether the CEC job is pending or failed. If `systemd-run` or the adapter's saved preferences are unavailable, no CEC change is applied.
+
+Tested with **40 Kodi-mocked/unit and shell-worker regression tests**. Physical testing of the CEC restart helper on an actual CoreELEC device is still required. The CEC configuration definition itself was previously tested manually on Ugoos AM6B+ CoreELEC 22 with Stop Playback across a Kodi restart.
