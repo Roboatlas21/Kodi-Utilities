@@ -1,4 +1,4 @@
-# Kodi Utilities — Device Setup (0.1.6)
+# Kodi Utilities — Device Setup (0.1.7)
 
 Manual CoreELEC 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
@@ -98,11 +98,11 @@ The approved shared profile (revision 8) requests exactly two HDMI-CEC options:
 - **When the TV is switched off** — Stop Playback (setting `standby_pc_on_tv_standby`, value `36044`)
 - **Action when switching to another source** — Stop Playback (setting `pause_or_stop_playback_on_deactivate`, value `36044`)
 
-These are peripheral CEC settings, not normal Kodi JSON-RPC settings. The add-on uses the read-only system CEC definition to check availability, and reads one uniquely identified saved CEC adapter configuration under the current Kodi profile. It skips settings that are absent or not yet saved, including the source-switch setting omitted from stock CoreELEC 22. It never edits CoreELEC's read-only system file or installs the upstream CEC fix. When CoreELEC makes the setting available, the user must manually run **Apply My Setup** again; updates never automatically apply settings.
+These are peripheral CEC settings, not normal Kodi JSON-RPC settings. The add-on uses the read-only system CEC definition to check availability, and reads one uniquely identified saved CEC adapter configuration under the current Kodi profile. It skips settings that are absent or not yet saved, including installed builds that lack the source-switch setting. It never edits CoreELEC's read-only system file or installs the upstream CEC fix. When CoreELEC makes the setting available, the user must manually run **Apply My Setup** again; updates never automatically apply settings.
 
-Applying available CEC changes requires explicit confirmation. Kodi then briefly restarts: an independent systemd timer stops Kodi, verifies that the saved CEC values still match the preview, saves a copy, updates only the approved values, and starts Kodi again. A changed value or ambiguous adapter file fails closed; the helper still attempts to restart Kodi. If no CEC changes are available, no restart is scheduled. A normal Kodi update/install never triggers the helper.
+Applying available CEC changes requires explicit confirmation. A transient systemd timer stops Kodi, verifies the saved CEC values after Kodi has shut down, saves a copy, updates only the approved values, and requests a **full CoreELEC reboot** (v0.1.7). The helper accepts a value that already equals the requested target, but refuses unexpected values or ambiguous adapter files without committing the proposed edits. Once Kodi has been stopped, the helper requests a full reboot even if it encounters an error, to recover HDMI output; if the reboot request fails, it attempts to start Kodi and reports an error. If no CEC changes are available, no reboot is scheduled. Installing/updating the add-on never triggers the helper.
 
-**Restore Previous Settings** can schedule another Kodi restart to restore the prior CEC values, provided the user has not independently changed those settings. The existing preview, missing-addon skipping, and non-CEC operations remain supported. Restart results are recorded under Kodi's `addon_data/script.kodi.utilities.setup` folder as `cec_job.status` and `cec_job.log`; use **Check for Updates** to see whether the CEC job is pending or failed. If `systemd-run` or the adapter's saved preferences are unavailable, no CEC change is applied.
+**Restore Previous Settings** can schedule another full CoreELEC reboot to restore the prior CEC values, provided the user has not independently changed those settings. The existing preview, missing-addon skipping, and non-CEC operations remain supported. Restart results are recorded under Kodi's `addon_data/script.kodi.utilities.setup` folder as `cec_job.status` and `cec_job.log`; use **Check for Updates** to see whether the CEC job is pending or failed. If `systemd-run` or the adapter's saved preferences are unavailable, no CEC change is applied.
 
 Tested with **40 Kodi-mocked/unit and shell-worker regression tests**. Physical testing of the CEC restart helper on an actual CoreELEC device is still required. The CEC configuration definition itself was previously tested manually on Ugoos AM6B+ CoreELEC 22 with Stop Playback across a Kodi restart.
 
@@ -114,3 +114,12 @@ The approved shared profile sets these normal Kodi Player → Language settings:
 - **Preferred subtitle language:** English (Kodi ID `locale.subtitlelanguage`, string value `English`)
 
 Kodi's stream-language options store the displayed language name as the actual string value. Both are standard `kodi_setting` operations supported by Device Setup v0.1.6; no add-on release or restart helper is needed to apply these two settings. They are previewed, backed up, and restored through the existing normal Kodi settings flow. They influence which available tracks Kodi prefers, but the subtitle-language preference alone does not guarantee subtitles will be enabled for every video. No other Player or accessibility settings are changed.
+
+## CoreELEC HDMI-CEC reboot recovery (v0.1.7)
+
+- The v0.1.6 helper could fail if Kodi saved the requested Stop Playback value during shutdown after the setup preview still showed Pause Playback. v0.1.7 treats values already equal to the requested target as satisfied, changes only keys still at their expected old values, and rejects any third/unexpected value before replacing the live CEC XML.
+- An explicit confirmation is shown before the one-time CEC helper runs. The helper now requests a **full CoreELEC reboot**, not a Kodi-only restart, whether the CEC operation succeeds or fails after Kodi was stopped. If systemd rejects the reboot, it attempts to restart Kodi and records an error in `cec_job.status`.
+- Success remains `rebooting` until the add-on sees a different system boot and verifies that the saved values still match the requested options and that the installed CEC definitions expose those options. An unchanged boot ID or missing value is not reported as success. Use **Check for Updates** after the reboot to see the result.
+- A `.changed` record lists the CEC values the helper actually modified. Any value Kodi itself had already saved to the target during shutdown is excluded from the add-on's Restore Previous Settings snapshot.
+- CEC preferences and all other existing profile operations are unchanged; the shared GitHub profile remains revision 8 with 14 entries. This is an add-on-only update.
+- **Tests:** 27 local isolated regression tests using mocked systemd/Kodi CEC files, plus Python compile and ZIP integrity checks. The full-reboot behavior still requires testing on one real CoreELEC 22 AM6B+ before deployment to additional boxes.
