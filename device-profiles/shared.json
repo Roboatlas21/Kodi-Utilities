@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 13,
+  "revision": 14,
   "changes": [
     {
       "type": "kodi_setting",
@@ -103,6 +103,15 @@
       "type": "kodi_setting",
       "id": "locale.speedunit",
       "value": "kmh"
+    },
+    {
+      "type": "install_addon",
+      "id": "weather.openmeteo"
+    },
+    {
+      "type": "kodi_setting",
+      "id": "weather.addon",
+      "value": "weather.openmeteo"
     }
   ]
 }

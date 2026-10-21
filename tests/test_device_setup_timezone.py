@@ -37,8 +37,13 @@ class PackageTests(unittest.TestCase):
         self.dialog = Mock()
         self.dialog.yesno.return_value = True
         self.dialog.select.return_value = -1
+        self.installed = set()
+        self.install_commands = []
+        self.fail_install = False
         xbmc = types.SimpleNamespace(getInfoLabel=lambda key: '21.3',
-            getCondVisibility=lambda key: False, LOGERROR=4, LOGWARNING=3, log=Mock())
+            getCondVisibility=lambda key: key == 'System.HasAddon(weather.openmeteo)' and 'weather.openmeteo' in self.installed,
+            executebuiltin=self.install, Monitor=lambda: types.SimpleNamespace(waitForAbort=lambda seconds: False),
+            LOGERROR=4, LOGWARNING=3, log=Mock())
         modules = {'xbmc': xbmc, 'xbmcgui': types.SimpleNamespace(Dialog=lambda: self.dialog),
                    'xbmcaddon': types.SimpleNamespace(Addon=Mock()),
                    'xbmcvfs': types.SimpleNamespace(translatePath=lambda path: str(self.data))}
@@ -67,6 +72,7 @@ class PackageTests(unittest.TestCase):
         self.native = False
         self.missing = set()
         self.values = {item['id']: 'old' for item in SHARED['changes'] if item['type']=='kodi_setting'}
+        self.values['weather.addon'] = ''
         self.values.update({self.tz.COUNTRY_ID: ORIGINAL['country'], self.tz.ZONE_ID: ORIGINAL['timezone']})
         self.writes = []
         self.service_calls = []
@@ -91,6 +97,12 @@ class PackageTests(unittest.TestCase):
     def version(self, version, distro='coreelec'):
         Path(self.tz.OS_RELEASE).write_text('ID="{}"\nVERSION_ID="{}"\nVERSION="{}"\n'.format(distro,version,version))
 
+    def install(self, command):
+        self.assertEqual(command, 'InstallAddon(weather.openmeteo)')
+        self.install_commands.append(command)
+        if not self.fail_install:
+            self.installed.add('weather.openmeteo')
+
     def rpc(self, method, params):
         if self.fail_rpc:
             raise RuntimeError('RPC transport failure')
@@ -104,6 +116,8 @@ class PackageTests(unittest.TestCase):
             return {'value': self.values[key]}
         if method == 'Settings.SetSettingValue':
             value = params['value']
+            if key == 'weather.addon' and value == 'weather.openmeteo':
+                self.assertIn(value, self.installed, 'Provider selected before installation finished')
             self.writes.append((key,value))
             if self.fail_setting == (key,value):
                 self.fail_setting = None
@@ -140,8 +154,8 @@ class PackageTests(unittest.TestCase):
     def test_package_profile_and_index(self):
         from resources.lib.profile import parse
         parsed = parse((ROOT/'device-profiles/shared.json').read_bytes())
-        self.assertEqual(parsed['revision'],13)
-        self.assertEqual(len(parsed['changes']),19)
+        self.assertEqual(parsed['revision'],14)
+        self.assertEqual(len(parsed['changes']),21)
         self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'videolibrary.recentlyaddeditems'),25)
         self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'myvideos.selectaction'),3)
         index = (ROOT/'addons.xml').read_bytes()
@@ -194,6 +208,7 @@ class PackageTests(unittest.TestCase):
         self.dialog.yesno.return_value = False
         self.app.apply()
         self.assertFalse(self.writes or self.service_calls)
+        self.assertFalse(self.install_commands)
         self.assertFalse(Path(self.app.ROLLBACK_FILE).exists())
 
     def test_already_set_is_noop(self):
@@ -371,6 +386,31 @@ class PackageTests(unittest.TestCase):
         self.app.restore()
         self.assertEqual(self.app.advanced_settings.get_limit_state(self.app.ADVANCED_FILE)['value'],50)
         self.assertEqual(ET.parse(self.app.ADVANCED_FILE).findtext('audio/foo'),'bar')
+
+    def test_weather_install_select_and_restore(self):
+        self.profile['changes'] = copy.deepcopy(SHARED['changes'][-2:])
+        self.app.apply()
+        self.assertEqual(self.install_commands, ['InstallAddon(weather.openmeteo)'])
+        self.assertEqual(self.values['weather.addon'], 'weather.openmeteo')
+        self.app.restore()
+        self.assertEqual(self.values['weather.addon'], '')
+        self.assertIn('weather.openmeteo', self.installed)
+        self.assertEqual(len(self.install_commands), 1)
+
+    def test_weather_install_failure_rolls_back_batch_without_selecting(self):
+        before = dict(self.values)
+        self.fail_install = True
+        with self.assertRaisesRegex(RuntimeError, 'Installation not verified'):
+            self.app.apply()
+        self.assertEqual(self.values, before)
+        self.assertNotIn(('weather.addon', 'weather.openmeteo'), self.writes)
+
+    def test_weather_reuses_installed_addon(self):
+        self.profile['changes'] = copy.deepcopy(SHARED['changes'][-2:])
+        self.installed.add('weather.openmeteo')
+        self.app.apply()
+        self.assertFalse(self.install_commands)
+        self.assertEqual(self.values['weather.addon'], 'weather.openmeteo')
 
 
 if __name__ == '__main__':

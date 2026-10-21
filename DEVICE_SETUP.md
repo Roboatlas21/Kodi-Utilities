@@ -4,7 +4,7 @@ Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Ko
 
 ## Settings policy
 
-- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, Default select action = Show information, timezone country = Canada / timezone = America/Toronto, temperature unit = Celsius, and speed unit = km/h (shared profile revision 13). All are applied only after confirmation.
+- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, Default select action = Show information, timezone country = Canada / timezone = America/Toronto, temperature unit = Celsius, speed unit = km/h, and installation/selection of Open-Meteo as the weather provider (shared profile revision 14). All are applied only after confirmation.
 - Installing the add-on, opening it, and checking updates **never modify any Kodi settings**.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
@@ -188,3 +188,14 @@ Validation: 25 passing regression tests against the actual v0.1.10 ZIP and share
 Both IDs and values were verified in Kodi 21 (Omega) and CoreELEC's Kodi 22 source. These ordinary Kodi settings are already supported by **Device Setup v0.1.10**; no new add-on release is required. Open the add-on and choose **Apply My Setup** to fetch revision 13. They take effect immediately, with no reboot required for these two changes. The existing preview, confirmation, backup, and restore flow applies. Region format, dates, clock format, and all previous shared-profile entries are unchanged.
 
 The existing 25 packaged-add-on regression checks pass against revision 13. Physical testing of these unit settings remains pending.
+
+
+## Open-Meteo weather provider (shared profile revision 14)
+
+**Device Setup v0.1.10 already supports this; no add-on update is required.** Run **Apply My Setup** to fetch the new profile. It installs `weather.openmeteo` through Kodi's normal add-on installer if missing, waits for Kodi to report it installed, and then sets `weather.addon` to `weather.openmeteo`. Open-Meteo is available in the official Kodi repository; no third-party repository URL or API key is needed. Kodi may display its normal installation confirmation. The weather-provider setting was verified in Kodi 21 and CoreELEC's Kodi 22 source.
+
+The two operations are deliberately ordered: installation must finish before selecting the provider. If installation is cancelled, unavailable, or not confirmed within the existing wait, Apply reports a failure and does not attempt provider selection. Previously applied reversible settings are rolled back. Installing the add-on is not automatically undone by rollback or **Restore Previous Settings**; restoring can return the previous weather-provider choice while leaving Open-Meteo installed.
+
+Locations remain local to each box. Open-Meteo supports initial location detection, and you can correct its location in **Settings → Services → Weather → Settings** if needed. This profile does not write a shared city or coordinates. Open-Meteo defaults to using Kodi's temperature and speed units, so fresh installs follow the shared Celsius/km/h choices. Existing custom Open-Meteo unit overrides are preserved.
+
+There is no reboot requirement for installing/selecting the weather provider. All prior profile settings remain unchanged. Validation: all 28 packaged-add-on regression checks pass, including installation before provider selection, cancelled/failed installation, reuse of an installed provider, and restoration without uninstalling it, with mocked Kodi APIs. Physical box testing is still pending.
