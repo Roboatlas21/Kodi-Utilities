@@ -1,10 +1,10 @@
-# Kodi Utilities — Device Setup (0.1.9)
+# Kodi Utilities — Device Setup (0.1.10)
 
-Manual CoreELEC 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
+Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
 ## Settings policy
 
-- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, and Default select action = Show information (shared profile revision 11). All are applied only after confirmation.
+- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, Default select action = Show information, and timezone country = Canada / timezone = America/Toronto (shared profile revision 12). All are applied only after confirmation.
 - Installing the add-on, opening it, and checking updates **never modify any Kodi settings**.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
@@ -34,6 +34,7 @@ Allowed operation objects (examples only; nothing below is active):
 - `{"type":"skin_setting","skin":"skin.arctic.fuse.3","id":"SomeSkinSetting","value":"Value"}`
 - `{"type":"addon_setting","addon_id":"some.addon","id":"some.setting","value":false}`
 - `{"type":"advanced_setting","id":"videolibrary.recentlyaddeditems","value":25}` (the only shared advanced-setting operation allowed)
+- `{"type":"timezone_setting","id":"timezone","value":{"country":"Canada","timezone":"America/Toronto"}}` (the only shared timezone pair allowed)
 - `{"type":"install_addon","id":"some.installed.repository.addon"}`
 
 **Do not add examples to the live profile.** Verify every exact setting ID and value before adding any operation. Other types, file-copying, bulk imports, and unknown fields are rejected.
@@ -141,7 +142,7 @@ Device Setup reads the existing XML safely and changes **only** the approved `vi
 
 **A full CoreELEC reboot is needed to activate any new limit.** This update does **not** automatically restart Kodi or reboot the box for the limit. Existing HDMI-CEC changes retain their previously approved full-reboot workflow when a CEC action is also pending. Installing or updating the add-on never applies settings by itself.
 
-**Update Device Setup to v0.1.9 or later before applying shared profile revision 10 or later.** v0.1.8 supports only the previous shared limit of 50 and rejects the entire profile when it requests 25. v0.1.9 accepts both approved shared values (25 and 50). Other advanced-setting IDs and values remain rejected. No other existing shared setting changes.
+**Use Device Setup v0.1.9 or later for shared profile revisions 10 and 11; revision 12 requires v0.1.10.** v0.1.8 supports only the previous shared limit of 50 and rejects the entire profile when it requests 25. v0.1.9 accepts both approved shared values (25 and 50). Other advanced-setting IDs and values remain rejected. No other existing shared setting changes.
 
 Offline tests: 47 tests (20 new XML/profile/apply/restore/Quick Settings cases plus the 27 existing CEC recovery regression tests), Python syntax compilation, shell syntax check, and ZIP archive integrity verification. Physical CoreELEC testing of this new XML workflow is still pending.
 
@@ -149,7 +150,7 @@ Offline tests: 47 tests (20 new XML/profile/apply/restore/Quick Settings cases p
 
 **Apply My Setup** sets **Settings → Media → Videos → Default select action** to **Show information**, using the normal Kodi setting `myvideos.selectaction` with integer value `3` (`ACTION_INFO`). This changes the default action when selecting a video to opening its information dialog. The separate **Default play action** setting is not changed.
 
-This is a normal Kodi setting supported by the existing apply flow. **Use Device Setup v0.1.9 or later for the current shared profile**, because v0.1.8 rejects its Recently Added limit of 25 before applying any settings, including this one. The normal preview, confirmation, backup and restore flow applies; installing or updating the add-on does not apply the setting automatically. This setting takes effect without restarting Kodi.
+This is a normal Kodi setting supported by the existing apply flow. **Use Device Setup v0.1.10 or later for the current shared profile**, because v0.1.8 rejects its Recently Added limit of 25 before applying any settings, including this one. The normal preview, confirmation, backup and restore flow applies; installing or updating the add-on does not apply the setting automatically. This setting takes effect without restarting Kodi.
 
 ## Shared-profile validation fix (v0.1.9)
 
@@ -158,3 +159,20 @@ This is a normal Kodi setting supported by the existing apply flow. **Use Device
 - Corrects Quick Settings text to refer to the shared profile's value instead of promising a reset to 50.
 - The CEC helper, XML backup/restore behavior, manual confirmation and no-auto-apply policy are unchanged.
 - Verified against the actual v0.1.9 ZIP and published revision 11: profile validation, applying and restoring both requested changes with mocked Kodi APIs, cancellation, rollback after a simulated Kodi rejection, unrelated XML preservation, and package/index integrity. Physical CoreELEC testing remains pending.
+
+
+## CoreELEC 21 / 22 and timezone setup (v0.1.10; shared profile revision 12)
+
+**Update Device Setup to v0.1.10 before applying revision 12.** Older versions do not understand the new paired timezone operation and reject the profile before making changes. The profile retains Recently Added = 25 and Default select action = Show information, and adds the requested **Canada / America/Toronto** pair. The region format (for example USA 12h) is independent and is not part of this operation.
+
+Device Setup reads `/etc/os-release` to identify CoreELEC and its version and displays that version with Kodi's build in the preview. It also queries Kodi's available settings: missing standard Kodi settings are explicitly skipped, while ordinary read/write errors still stop the operation. This avoids assuming that every build exposes the same options.
+
+- On CoreELEC 21, the add-on uses Kodi's `locale.timezonecountry` and `locale.timezone` settings. Country is applied first, then timezone, and both are verified. This order is also used when restoring because changing country can automatically choose a different city.
+- On CoreELEC 22, the same Kodi settings are used if the installed build still exposes both. Otherwise, the add-on verifies CoreELEC's timezone data and `tz-data.service`, updates only `/storage/.cache/timezone`, restarts that service, verifies `/var/run/localtime`, and updates the running process timezone. This follows the mechanism in the CoreELEC settings add-on. The country is derived from the timezone database, so America/Toronto displays as Canada.
+- Unknown CoreELEC versions, other operating systems, or missing timezone capabilities are shown as skipped. CoreELEC 21 never falls back to the CoreELEC 22 file method. A partially exposed Kodi timezone pair is also skipped.
+- Preview and Cancel make no changes. Apply saves the original country/timezone pair and, for the CoreELEC service method, the original configuration contents or absence. Failed partial timezone changes attempt an immediate rollback. Normal batch rollback and Restore Previous Settings also support the pair. Restore skips a manually changed pair or a changed timezone backend after a firmware upgrade.
+- No Kodi restart or box reboot is scheduled for timezone changes. Existing CEC changes retain their separately confirmed reboot flow. Reopen the CoreELEC settings screen if it was already open when applying a timezone change.
+
+Implementation references: [Kodi 21 timezone handling](https://github.com/xbmc/xbmc/blob/Omega/xbmc/platform/posix/PosixTimezone.cpp), [CoreELEC settings timezone handling](https://github.com/CoreELEC/service.coreelec.settings/blob/coreelec-22/src/resources/lib/modules/system.py), and [CoreELEC tz-data service](https://github.com/CoreELEC/CoreELEC/blob/coreelec-22/packages/sysutils/tz/system.d/tz-data.service).
+
+Validation: 25 passing regression tests against the actual v0.1.10 ZIP and shared profile, with mocked Kodi/systemd services, plus archive/index/checksum and Python/shell syntax checks. Run `python tests/test_device_setup_timezone.py` from the repository checkout. Physical CoreELEC 21 and 22 testing remains pending.
