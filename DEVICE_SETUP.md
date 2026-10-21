@@ -4,7 +4,7 @@ Manual CoreELEC 22 / Kodi configuration replication through the existing Kodi Ut
 
 ## Settings policy
 
-- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, and the Recently Added items limit of 50. All are applied only after confirmation.
+- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, and the native Kodi Recently Added items limit of 25 (shared profile revision 10). All are applied only after confirmation.
 - Installing the add-on, opening it, and checking updates **never modify any Kodi settings**.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
@@ -33,7 +33,7 @@ Allowed operation objects (examples only; nothing below is active):
 - `{"type":"kodi_setting","id":"some.setting.id","value":true}`
 - `{"type":"skin_setting","skin":"skin.arctic.fuse.3","id":"SomeSkinSetting","value":"Value"}`
 - `{"type":"addon_setting","addon_id":"some.addon","id":"some.setting","value":false}`
-- `{"type":"advanced_setting","id":"videolibrary.recentlyaddeditems","value":50}` (the only shared advanced-setting operation allowed)
+- `{"type":"advanced_setting","id":"videolibrary.recentlyaddeditems","value":25}` (the only shared advanced-setting operation allowed)
 - `{"type":"install_addon","id":"some.installed.repository.addon"}`
 
 **Do not add examples to the live profile.** Verify every exact setting ID and value before adding any operation. Other types, file-copying, bulk imports, and unknown fields are rejected.
@@ -125,22 +125,22 @@ Kodi's stream-language options store the displayed language name as the actual s
 - CEC preferences and all other existing profile operations are unchanged; the v0.1.7 shared GitHub profile remained revision 8 with 14 entries. That release was an add-on-only update.
 - **Tests:** 27 local isolated regression tests using mocked systemd/Kodi CEC files, plus Python compile and ZIP integrity checks. The full-reboot behavior still requires testing on one real CoreELEC 22 AM6B+ before deployment to additional boxes.
 
-## Recently Added items limit (v0.1.8; shared profile revision 9)
+## Recently Added items limit (v0.1.8; shared profile revision 10)
 
-**Apply My Setup** sets the native Kodi video-library Recently Added limit from its default **25** to **50**, with this explicitly approved shared-profile operation:
+**Apply My Setup** sets the native Kodi video-library Recently Added limit to its default **25**, with this explicitly approved shared-profile operation. Shared profile revision 9 requested 50; revision 10 restores 25 at the user's request because this setting does not override Jellyfin for Kodi's separate list limits:
 
 ```json
-{"type":"advanced_setting","id":"videolibrary.recentlyaddeditems","value":50}
+{"type":"advanced_setting","id":"videolibrary.recentlyaddeditems","value":25}
 ```
 
-Kodi stores this setting at `/storage/.kodi/userdata/advancedsettings.xml` (Kodi path: `special://masterprofile/advancedsettings.xml`), as `<advancedsettings><videolibrary><recentlyaddeditems>50</recentlyaddeditems></videolibrary></advancedsettings>`. This setting also controls native Recently Added episodes and music videos. Arctic Fuse 3 widgets using Kodi's native Recently Added Movies library path should receive up to 50 items; add-on-provided widgets may have their own limit.
+Kodi stores this setting at `/storage/.kodi/userdata/advancedsettings.xml` (Kodi path: `special://masterprofile/advancedsettings.xml`), as `<advancedsettings><videolibrary><recentlyaddeditems>25</recentlyaddeditems></videolibrary></advancedsettings>`. This setting also controls native Recently Added episodes and music videos. Arctic Fuse 3 widgets using Kodi's native Recently Added Movies library path should receive up to 25 items. Jellyfin-generated lists and smart playlists with explicit limits use their own limits; this setting does not override them.
 
 Device Setup reads the existing XML safely and changes **only** the approved `videolibrary/recentlyaddeditems` field. It preserves unrelated settings, comments and processing instructions, makes a separate backup before each modification, and writes atomically. It refuses malformed XML, ambiguous duplicate entries, and symbolic links. Restore Previous Settings reverses the effective setting and removes an entry or entire file if Device Setup originally created it, without overwriting unrelated edits. The public profile cannot request arbitrary advanced settings.
 
-**Quick Settings → Recently Added items limit** also offers **25 / 50 / 75 / 100** for the current box only. It is independent of shared-profile restore, just like Device name; the next **Apply My Setup** will bring it back to the shared value of 50.
+**Quick Settings → Recently Added items limit** also offers **25 / 50 / 75 / 100** for the current box only. It is independent of shared-profile restore, just like Device name; the next **Apply My Setup** will bring it back to the shared value of 25.
 
 **A full CoreELEC reboot is needed to activate any new limit.** This update does **not** automatically restart Kodi or reboot the box for the limit. Existing HDMI-CEC changes retain their previously approved full-reboot workflow when a CEC action is also pending. Installing or updating the add-on never applies settings by itself.
 
-**Update Device Setup to v0.1.8 before applying shared profile revision 9.** Older versions reject unsupported operation types rather than silently applying a partial profile. No other existing shared setting changes.
+**Use Device Setup v0.1.8 or later before applying shared profile revision 9 or later.** Revision 10 is a profile-only update and does not require a new add-on release. Older versions reject unsupported operation types rather than silently applying a partial profile. No other existing shared setting changes.
 
 Offline tests: 47 tests (20 new XML/profile/apply/restore/Quick Settings cases plus the 27 existing CEC recovery regression tests), Python syntax compilation, shell syntax check, and ZIP archive integrity verification. Physical CoreELEC testing of this new XML workflow is still pending.

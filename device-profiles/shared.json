@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 9,
+  "revision": 10,
   "changes": [
     {
       "type": "kodi_setting",
@@ -79,7 +79,7 @@
     {
       "type": "advanced_setting",
       "id": "videolibrary.recentlyaddeditems",
-      "value": 50
+      "value": 25
     }
   ]
 }
