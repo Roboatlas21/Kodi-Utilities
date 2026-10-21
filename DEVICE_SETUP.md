@@ -1,4 +1,4 @@
-# Kodi Utilities — Device Setup (0.1.10)
+# Kodi Utilities — Device Setup (0.1.11)
 
 Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
@@ -19,7 +19,7 @@ Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Ko
 1. Install the existing Kodi Utilities repository on a box.
 2. Choose **Kodi Utilities - Device Setup** from that repository.
 3. Open it from Kodi's **Program add-ons**.
-4. Choose **Quick Settings** to edit this box’s advertised name or Recently Added item limit, or **Preview GitHub Changes** to inspect shared configuration changes.
+4. Choose **Quick Settings** to edit this box’s advertised name, Recently Added item limit, or weather city, or **Preview GitHub Changes** to inspect shared configuration changes.
 5. When you have asked AI to modify the public profile, use **Apply My Setup** after reading the exact changes.
 
 Repository profile URL: https://raw.githubusercontent.com/Roboatlas21/Kodi-Utilities/main/device-profiles/shared.json
@@ -199,3 +199,16 @@ The two operations are deliberately ordered: installation must finish before sel
 Locations remain local to each box. Open-Meteo supports initial location detection, and you can correct its location in **Settings → Services → Weather → Settings** if needed. This profile does not write a shared city or coordinates. Open-Meteo defaults to using Kodi's temperature and speed units, so fresh installs follow the shared Celsius/km/h choices. Existing custom Open-Meteo unit overrides are preserved.
 
 There is no reboot requirement for installing/selecting the weather provider. All prior profile settings remain unchanged. Validation: all 28 packaged-add-on regression checks pass, including installation before provider selection, cancelled/failed installation, reuse of an installed provider, and restoration without uninstalling it, with mocked Kodi APIs. Physical box testing is still pending.
+
+
+## Local weather city picker (v0.1.11)
+
+On each box, open **Device Setup → Quick Settings → Weather city** and select **Cambridge, Ontario**, **Waterloo, Ontario**, or **Oakville, Ontario**. Update Device Setup to v0.1.11 to get this menu. If Open-Meteo is not installed yet, run **Apply My Setup** first. The menu shows the current primary Open-Meteo location and preselects a matching preset. Cancelling makes no changes.
+
+The selection changes only that box's primary Open-Meteo location, including its coordinates and `America/Toronto` timezone, selects Open-Meteo and location 1 in Kodi, and expires the primary location's weather/map cache timestamps using Open-Meteo's own convention. It requests a weather refresh; Open-Meteo's background service normally fetches the new city's forecast within five minutes. No reboot is required. No live geocoding lookup is required when using the picker.
+
+The three city-centre coordinates were checked against [Open-Meteo's GeoNames geocoding API](https://open-meteo.com/en/docs/geocoding-api) on 2026-10-21: Cambridge (GeoNames 5913695, 43.3601 / -80.31269), Waterloo (6176823, 43.4668 / -80.51639), and Oakville (6092122, 43.45011 / -79.68292).
+
+The picker verifies the installed Open-Meteo setting definitions before writing and allows an in-progress weather download to finish first. It restores attempted setting changes if saving fails. Existing secondary locations, custom aliases, alerts and unit preferences are preserved. City selection is a local Quick Setting: **Apply My Setup** does not overwrite it and shared-profile **Restore Previous Settings** does not undo it. Shared profile revision 14 is unchanged.
+
+Validation: 32 passing tests against the actual v0.1.11 ZIP, including all three city presets, preservation through shared-profile Apply, cancellation, partial-write rollback, unavailable/incompatible Open-Meteo, and existing timezone/setup flows. Package integrity, Python syntax, and repository index/checksum are verified. Physical CoreELEC 21/22 testing is pending.

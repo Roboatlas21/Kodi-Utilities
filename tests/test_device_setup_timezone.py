@@ -15,7 +15,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE = ROOT / 'script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.10.zip'
+PACKAGE = ROOT / 'script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.11.zip'
 SHARED = json.loads((ROOT / 'device-profiles/shared.json').read_text())
 TARGET = {'country': 'Canada', 'timezone': 'America/Toronto'}
 ORIGINAL = {'country': 'United States', 'timezone': 'America/New_York'}
@@ -39,6 +39,7 @@ class PackageTests(unittest.TestCase):
         self.dialog.select.return_value = -1
         self.installed = set()
         self.install_commands = []
+        self.weather_refreshes = 0
         self.fail_install = False
         xbmc = types.SimpleNamespace(getInfoLabel=lambda key: '21.3',
             getCondVisibility=lambda key: key == 'System.HasAddon(weather.openmeteo)' and 'weather.openmeteo' in self.installed,
@@ -98,6 +99,9 @@ class PackageTests(unittest.TestCase):
         Path(self.tz.OS_RELEASE).write_text('ID="{}"\nVERSION_ID="{}"\nVERSION="{}"\n'.format(distro,version,version))
 
     def install(self, command):
+        if command == 'Weather.Refresh':
+            self.weather_refreshes += 1
+            return
         self.assertEqual(command, 'InstallAddon(weather.openmeteo)')
         self.install_commands.append(command)
         if not self.fail_install:
@@ -160,11 +164,11 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'myvideos.selectaction'),3)
         index = (ROOT/'addons.xml').read_bytes()
         self.assertEqual(hashlib.md5(index).hexdigest(),(ROOT/'addons.xml.md5').read_text())
-        self.assertEqual(ET.fromstring(index).find("addon[@id='script.kodi.utilities.setup']").get('version'),'0.1.10')
+        self.assertEqual(ET.fromstring(index).find("addon[@id='script.kodi.utilities.setup']").get('version'),'0.1.11')
         with zipfile.ZipFile(PACKAGE) as archive:
             self.assertIsNone(archive.testzip())
-            self.assertEqual(len(archive.namelist()),9)
-            self.assertEqual(ET.fromstring(archive.read('script.kodi.utilities.setup/addon.xml')).get('version'),'0.1.10')
+            self.assertEqual(len(archive.namelist()),10)
+            self.assertEqual(ET.fromstring(archive.read('script.kodi.utilities.setup/addon.xml')).get('version'),'0.1.11')
             for name in archive.namelist():
                 if name.endswith('.py'):
                     compile(archive.read(name),name,'exec')
@@ -411,6 +415,91 @@ class PackageTests(unittest.TestCase):
         self.app.apply()
         self.assertFalse(self.install_commands)
         self.assertEqual(self.values['weather.addon'], 'weather.openmeteo')
+
+    def prepare_city(self):
+        self.installed.add('weather.openmeteo')
+        self.city_values = {'loc1':'Toronto, Ontario, CA','loc1lat':43.7,'loc1lon':-79.4,
+            'loc1tz':'America/Toronto','loc1data':'999999999','loc1map':'999999999',
+            'loc1rv':'999999999','loc1gc':'999999999','service':'idle',
+            'loc2':'Another city','loc1user':'Home','loc1alert':False,'unittemp':'app'}
+        self.city_writes = []
+        self.city_fail_key = None
+        def setter(key,value):
+            self.city_writes.append(key)
+            if key == self.city_fail_key:
+                self.city_fail_key = None
+                return False
+            self.city_values[key] = value
+            return True
+        addon = types.SimpleNamespace(getSettingString=lambda key:self.city_values[key],
+            getSettingNumber=lambda key:self.city_values[key],
+            setSettingString=setter,setSettingNumber=setter,getAddonInfo=lambda key:str(self.data))
+        self.app.xbmcaddon.Addon.return_value = addon
+        self.app.xbmcgui.DialogProgressBG = Mock(return_value=Mock())
+        self.values['weather.currentlocation'] = 2
+        self.values['services.devicename'] = 'Test box'
+        resource = self.data/'resources'
+        resource.mkdir(exist_ok=True)
+        schema = ET.Element('settings')
+        for key in ('loc1','loc1lat','loc1lon','loc1tz','loc1data','loc1map','loc1rv','loc1gc'):
+            ET.SubElement(schema,'setting',id=key,type='number' if key in ('loc1lat','loc1lon') else 'string')
+        ET.ElementTree(schema).write(resource/'settings.xml')
+        return addon
+
+    def test_city_picker_presets_persist_through_shared_apply(self):
+        self.prepare_city()
+        choices = [('Cambridge',43.3601,-80.31269),('Waterloo',43.4668,-80.51639),('Oakville',43.45011,-79.68292)]
+        for selection,(city,lat,lon) in enumerate(choices):
+            self.dialog.select.side_effect = [2,selection]
+            self.app.quick_settings()
+            self.assertEqual(self.city_values['loc1'],city+', Ontario, CA')
+            self.assertEqual((self.city_values['loc1lat'],self.city_values['loc1lon']),(lat,lon))
+            self.assertEqual(self.values['weather.currentlocation'],1)
+            self.assertEqual(self.values['weather.addon'],'weather.openmeteo')
+            self.assertEqual(self.city_values['loc1data'],'321318000')
+        self.assertEqual(self.weather_refreshes,3)
+        before = dict(self.city_values)
+        self.app.apply()
+        self.assertEqual(self.city_values,before)
+        self.assertEqual(self.city_values['loc2'],'Another city')
+        self.assertEqual(self.city_values['loc1user'],'Home')
+        self.assertFalse(self.city_values['loc1alert'])
+        self.assertEqual(self.city_values['unittemp'],'app')
+
+    def test_city_picker_cancel_does_not_write(self):
+        self.prepare_city()
+        self.dialog.select.return_value = -1
+        self.app.edit_weather_city()
+        self.assertFalse(self.city_writes or self.writes or self.weather_refreshes)
+        self.assertFalse(Path(self.app.ROLLBACK_FILE).exists())
+
+    def test_city_partial_failure_restores_coordinates_and_previous_selection(self):
+        self.prepare_city()
+        before = dict(self.city_values)
+        kodi_before = dict(self.values)
+        self.city_fail_key = 'loc1lon'
+        self.dialog.select.return_value = 0
+        with self.assertRaisesRegex(RuntimeError,'Previous settings restored'):
+            self.app.edit_weather_city()
+        self.assertEqual(self.city_values,before)
+        self.assertEqual(self.values,kodi_before)
+        self.assertFalse(self.weather_refreshes)
+        self.fail_setting = ('weather.currentlocation',1)
+        with self.assertRaisesRegex(RuntimeError,'Previous settings restored'):
+            self.app.edit_weather_city()
+        self.assertEqual(self.city_values,before)
+        self.assertEqual(self.values,kodi_before)
+
+    def test_city_missing_addon_or_changed_schema_does_not_write(self):
+        self.app.edit_weather_city()
+        self.assertIn('Apply My Setup',self.dialog.ok.call_args.args[1])
+        self.dialog.select.assert_not_called()
+        self.prepare_city()
+        (self.data/'resources/settings.xml').write_text('<settings/>')
+        self.dialog.select.return_value = 0
+        with self.assertRaisesRegex(RuntimeError,'different location settings'):
+            self.app.edit_weather_city()
+        self.assertFalse(self.city_writes or self.writes or self.weather_refreshes)
 
 
 if __name__ == '__main__':
