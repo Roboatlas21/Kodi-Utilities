@@ -4,7 +4,7 @@ Manual CoreELEC 22 / Kodi configuration replication through the existing Kodi Ut
 
 ## Settings policy
 
-- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, and the native Kodi Recently Added items limit of 25 (shared profile revision 10). All are applied only after confirmation.
+- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, and Default select action = Show information (shared profile revision 11). All are applied only after confirmation.
 - Installing the add-on, opening it, and checking updates **never modify any Kodi settings**.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
@@ -144,3 +144,9 @@ Device Setup reads the existing XML safely and changes **only** the approved `vi
 **Use Device Setup v0.1.8 or later before applying shared profile revision 9 or later.** Revision 10 is a profile-only update and does not require a new add-on release. Older versions reject unsupported operation types rather than silently applying a partial profile. No other existing shared setting changes.
 
 Offline tests: 47 tests (20 new XML/profile/apply/restore/Quick Settings cases plus the 27 existing CEC recovery regression tests), Python syntax compilation, shell syntax check, and ZIP archive integrity verification. Physical CoreELEC testing of this new XML workflow is still pending.
+
+## Default select action (shared profile revision 11)
+
+**Apply My Setup** sets **Settings → Media → Videos → Default select action** to **Show information**, using the normal Kodi setting `myvideos.selectaction` with integer value `3` (`ACTION_INFO`). This changes the default action when selecting a video to opening its information dialog. The separate **Default play action** setting is not changed.
+
+This is a shared-profile-only update supported by the existing Device Setup v0.1.8. The normal preview, confirmation, backup and restore flow applies; installing or updating the add-on does not apply the setting automatically. This setting takes effect without restarting Kodi.
