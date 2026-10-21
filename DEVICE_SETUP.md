@@ -1,4 +1,4 @@
-# Kodi Utilities — Device Setup (0.1.11)
+# Kodi Utilities — Device Setup (0.1.12)
 
 Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
@@ -212,3 +212,12 @@ The three city-centre coordinates were checked against [Open-Meteo's GeoNames ge
 The picker verifies the installed Open-Meteo setting definitions before writing and allows an in-progress weather download to finish first. It restores attempted setting changes if saving fails. Existing secondary locations, custom aliases, alerts and unit preferences are preserved. City selection is a local Quick Setting: **Apply My Setup** does not overwrite it and shared-profile **Restore Previous Settings** does not undo it. Shared profile revision 14 is unchanged.
 
 Validation: 32 passing tests against the actual v0.1.11 ZIP, including all three city presets, preservation through shared-profile Apply, cancellation, partial-write rollback, unavailable/incompatible Open-Meteo, and existing timezone/setup flows. Package integrity, Python syntax, and repository index/checksum are verified. Physical CoreELEC 21/22 testing is pending.
+
+
+## Weather coordinate verification fix (v0.1.12)
+
+Fixes the reported `Open-Meteo refused to update loc1lon` error when selecting an Ontario city. Kodi's `CSettingNumber::ToString` saves numbers with six significant digits and reloads add-on settings after saving: Cambridge's longitude `-80.31269` becomes `-80.3127`. Device Setup v0.1.11 incorrectly required exact equality and rolled the change back. Numeric verification now compares at Kodi's saved precision, while text settings still require an exact match. Rejected writes and genuinely different coordinates still fail and restore the previous settings.
+
+Update Device Setup to **v0.1.12**, then choose the city again under **Quick Settings → Weather city**. No reboot is needed. Shared profile revision 14 and all three city presets are unchanged.
+
+Validation: the test fixture now reproduces Kodi's number serialization/reload and produced the exact reported longitude error against v0.1.11. All 33 checks pass against the v0.1.12 package, including all three presets and rollback when coordinate readback has the wrong sign, an invalid number, or the unchanged old value. Physical CoreELEC confirmation is pending.

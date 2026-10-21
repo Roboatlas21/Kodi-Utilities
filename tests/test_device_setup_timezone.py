@@ -15,7 +15,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE = ROOT / 'script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.11.zip'
+PACKAGE = ROOT / 'script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.12.zip'
 SHARED = json.loads((ROOT / 'device-profiles/shared.json').read_text())
 TARGET = {'country': 'Canada', 'timezone': 'America/Toronto'}
 ORIGINAL = {'country': 'United States', 'timezone': 'America/New_York'}
@@ -164,11 +164,11 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'myvideos.selectaction'),3)
         index = (ROOT/'addons.xml').read_bytes()
         self.assertEqual(hashlib.md5(index).hexdigest(),(ROOT/'addons.xml.md5').read_text())
-        self.assertEqual(ET.fromstring(index).find("addon[@id='script.kodi.utilities.setup']").get('version'),'0.1.11')
+        self.assertEqual(ET.fromstring(index).find("addon[@id='script.kodi.utilities.setup']").get('version'),'0.1.12')
         with zipfile.ZipFile(PACKAGE) as archive:
             self.assertIsNone(archive.testzip())
             self.assertEqual(len(archive.namelist()),10)
-            self.assertEqual(ET.fromstring(archive.read('script.kodi.utilities.setup/addon.xml')).get('version'),'0.1.11')
+            self.assertEqual(ET.fromstring(archive.read('script.kodi.utilities.setup/addon.xml')).get('version'),'0.1.12')
             for name in archive.namelist():
                 if name.endswith('.py'):
                     compile(archive.read(name),name,'exec')
@@ -429,7 +429,9 @@ class PackageTests(unittest.TestCase):
             if key == self.city_fail_key:
                 self.city_fail_key = None
                 return False
-            self.city_values[key] = value
+            # Kodi CSettingNumber::ToString saves six significant digits;
+            # SaveSettings reloads those values into the running add-on.
+            self.city_values[key] = float(format(value, '.6g')) if key in ('loc1lat','loc1lon') else value
             return True
         addon = types.SimpleNamespace(getSettingString=lambda key:self.city_values[key],
             getSettingNumber=lambda key:self.city_values[key],
@@ -453,7 +455,8 @@ class PackageTests(unittest.TestCase):
             self.dialog.select.side_effect = [2,selection]
             self.app.quick_settings()
             self.assertEqual(self.city_values['loc1'],city+', Ontario, CA')
-            self.assertEqual((self.city_values['loc1lat'],self.city_values['loc1lon']),(lat,lon))
+            self.assertEqual((self.city_values['loc1lat'],self.city_values['loc1lon']),
+                             (float(format(lat,'.6g')),float(format(lon,'.6g'))))
             self.assertEqual(self.values['weather.currentlocation'],1)
             self.assertEqual(self.values['weather.addon'],'weather.openmeteo')
             self.assertEqual(self.city_values['loc1data'],'321318000')
@@ -472,6 +475,26 @@ class PackageTests(unittest.TestCase):
         self.app.edit_weather_city()
         self.assertFalse(self.city_writes or self.writes or self.weather_refreshes)
         self.assertFalse(Path(self.app.ROLLBACK_FILE).exists())
+
+    def test_city_coordinate_readback_failure_still_rolls_back(self):
+        for corrupt in (lambda value: -value, lambda value: float('nan'), lambda value: -79.4):
+            with self.subTest(corrupt=corrupt):
+                addon = self.prepare_city()
+                before = dict(self.city_values)
+                kodi_before = dict(self.values)
+                setter = addon.setSettingNumber
+                def corrupt_once(key, value):
+                    if key == 'loc1lon':
+                        addon.setSettingNumber = setter
+                        return setter(key, corrupt(value))
+                    return setter(key, value)
+                addon.setSettingNumber = corrupt_once
+                self.dialog.select.return_value = 0
+                with self.assertRaisesRegex(RuntimeError, 'did not save loc1lon correctly.*Previous settings restored'):
+                    self.app.edit_weather_city()
+                self.assertEqual(self.city_values, before)
+                self.assertEqual(self.values, kodi_before)
+                self.assertFalse(self.weather_refreshes)
 
     def test_city_partial_failure_restores_coordinates_and_previous_selection(self):
         self.prepare_city()
