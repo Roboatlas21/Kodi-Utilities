@@ -4,7 +4,7 @@ Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Ko
 
 ## Settings policy
 
-- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, Default select action = Show information, and timezone country = Canada / timezone = America/Toronto (shared profile revision 12). All are applied only after confirmation.
+- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, Default select action = Show information, timezone country = Canada / timezone = America/Toronto, temperature unit = Celsius, and speed unit = km/h (shared profile revision 13). All are applied only after confirmation.
 - Installing the add-on, opening it, and checking updates **never modify any Kodi settings**.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
@@ -176,3 +176,15 @@ Device Setup reads `/etc/os-release` to identify CoreELEC and its version and di
 Implementation references: [Kodi 21 timezone handling](https://github.com/xbmc/xbmc/blob/Omega/xbmc/platform/posix/PosixTimezone.cpp), [CoreELEC settings timezone handling](https://github.com/CoreELEC/service.coreelec.settings/blob/coreelec-22/src/resources/lib/modules/system.py), and [CoreELEC tz-data service](https://github.com/CoreELEC/CoreELEC/blob/coreelec-22/packages/sysutils/tz/system.d/tz-data.service).
 
 Validation: 25 passing regression tests against the actual v0.1.10 ZIP and shared profile, with mocked Kodi/systemd services, plus archive/index/checksum and Python/shell syntax checks. Run `python tests/test_device_setup_timezone.py` from the repository checkout. Physical CoreELEC 21 and 22 testing remains pending.
+
+
+## Celsius and kilometres per hour (shared profile revision 13)
+
+**Apply My Setup** now sets **Settings → Interface → Regional → Temperature unit** to **°C** and **Speed unit** to **km/h**. These are explicit unit choices, independent of the region's defaults:
+
+- `locale.temperatureunit`: string `c` (Celsius).
+- `locale.speedunit`: string `kmh` (kilometres per hour).
+
+Both IDs and values were verified in Kodi 21 (Omega) and CoreELEC's Kodi 22 source. These ordinary Kodi settings are already supported by **Device Setup v0.1.10**; no new add-on release is required. Open the add-on and choose **Apply My Setup** to fetch revision 13. They take effect immediately, with no reboot required for these two changes. The existing preview, confirmation, backup, and restore flow applies. Region format, dates, clock format, and all previous shared-profile entries are unchanged.
+
+The existing 25 packaged-add-on regression checks pass against revision 13. Physical testing of these unit settings remains pending.

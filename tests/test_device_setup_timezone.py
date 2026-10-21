@@ -19,7 +19,7 @@ PACKAGE = ROOT / 'script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.10
 SHARED = json.loads((ROOT / 'device-profiles/shared.json').read_text())
 TARGET = {'country': 'Canada', 'timezone': 'America/Toronto'}
 ORIGINAL = {'country': 'United States', 'timezone': 'America/New_York'}
-OP = SHARED['changes'][-1]
+OP = next(item for item in SHARED['changes'] if item['type'] == 'timezone_setting')
 UNPACK = tempfile.TemporaryDirectory()
 with zipfile.ZipFile(PACKAGE) as archive:
     archive.extractall(UNPACK.name)
@@ -140,10 +140,10 @@ class PackageTests(unittest.TestCase):
     def test_package_profile_and_index(self):
         from resources.lib.profile import parse
         parsed = parse((ROOT/'device-profiles/shared.json').read_bytes())
-        self.assertEqual(parsed['revision'],12)
-        self.assertEqual(len(parsed['changes']),17)
-        self.assertEqual(parsed['changes'][-3]['value'],25)
-        self.assertEqual(parsed['changes'][-2]['value'],3)
+        self.assertEqual(parsed['revision'],13)
+        self.assertEqual(len(parsed['changes']),19)
+        self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'videolibrary.recentlyaddeditems'),25)
+        self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'myvideos.selectaction'),3)
         index = (ROOT/'addons.xml').read_bytes()
         self.assertEqual(hashlib.md5(index).hexdigest(),(ROOT/'addons.xml.md5').read_text())
         self.assertEqual(ET.fromstring(index).find("addon[@id='script.kodi.utilities.setup']").get('version'),'0.1.10')
@@ -354,12 +354,12 @@ class PackageTests(unittest.TestCase):
                       {'country':'Canada','timezone':'America/Toronto','extra':True},
                       'America/Toronto',True,None):
             invalid=copy.deepcopy(SHARED)
-            invalid['changes'][-1]['value']=value
+            next(item for item in invalid['changes'] if item['type'] == 'timezone_setting')['value']=value
             with self.assertRaises(ProfileError):
                 validate(invalid)
         for limit in (25,50):
             valid=copy.deepcopy(SHARED)
-            valid['changes'][-3]['value']=limit
+            next(item for item in valid['changes'] if item['type'] == 'advanced_setting')['value']=limit
             validate(valid)
 
     def test_existing_recent_limit_and_unrelated_xml_survive(self):

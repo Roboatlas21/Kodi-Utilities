@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 12,
+  "revision": 13,
   "changes": [
     {
       "type": "kodi_setting",
@@ -93,6 +93,16 @@
         "country": "Canada",
         "timezone": "America/Toronto"
       }
+    },
+    {
+      "type": "kodi_setting",
+      "id": "locale.temperatureunit",
+      "value": "c"
+    },
+    {
+      "type": "kodi_setting",
+      "id": "locale.speedunit",
+      "value": "kmh"
     }
   ]
 }
