@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 7,
+  "revision": 8,
   "changes": [
     {
       "type": "kodi_setting",
@@ -65,6 +65,16 @@
       "type": "cec_setting",
       "id": "pause_or_stop_playback_on_deactivate",
       "value": 36044
+    },
+    {
+      "type": "kodi_setting",
+      "id": "locale.audiolanguage",
+      "value": "English"
+    },
+    {
+      "type": "kodi_setting",
+      "id": "locale.subtitlelanguage",
+      "value": "English"
     }
   ]
 }

@@ -4,7 +4,7 @@ Manual CoreELEC 22 / Kodi configuration replication through the existing Kodi Ut
 
 ## Settings policy
 
-- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), and three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button). All are applied only after confirmation.
+- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, and preferred English audio and subtitle languages. All are applied only after confirmation.
 - Installing the add-on, opening it, and checking updates **never modify any Kodi settings**.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
@@ -93,7 +93,7 @@ This release adds the explicitly requested File Manager source to the existing s
 
 ## HDMI-CEC Stop Playback support (v0.1.6)
 
-The approved shared profile (revision 7) requests exactly two HDMI-CEC options:
+The approved shared profile (revision 8) requests exactly two HDMI-CEC options:
 
 - **When the TV is switched off** — Stop Playback (setting `standby_pc_on_tv_standby`, value `36044`)
 - **Action when switching to another source** — Stop Playback (setting `pause_or_stop_playback_on_deactivate`, value `36044`)
@@ -105,3 +105,12 @@ Applying available CEC changes requires explicit confirmation. Kodi then briefly
 **Restore Previous Settings** can schedule another Kodi restart to restore the prior CEC values, provided the user has not independently changed those settings. The existing preview, missing-addon skipping, and non-CEC operations remain supported. Restart results are recorded under Kodi's `addon_data/script.kodi.utilities.setup` folder as `cec_job.status` and `cec_job.log`; use **Check for Updates** to see whether the CEC job is pending or failed. If `systemd-run` or the adapter's saved preferences are unavailable, no CEC change is applied.
 
 Tested with **40 Kodi-mocked/unit and shell-worker regression tests**. Physical testing of the CEC restart helper on an actual CoreELEC device is still required. The CEC configuration definition itself was previously tested manually on Ugoos AM6B+ CoreELEC 22 with Stop Playback across a Kodi restart.
+
+## Preferred playback languages (shared profile revision 8)
+
+The approved shared profile sets these normal Kodi Player → Language settings:
+
+- **Preferred audio language:** English (Kodi ID `locale.audiolanguage`, string value `English`)
+- **Preferred subtitle language:** English (Kodi ID `locale.subtitlelanguage`, string value `English`)
+
+Kodi's stream-language options store the displayed language name as the actual string value. Both are standard `kodi_setting` operations supported by Device Setup v0.1.6; no add-on release or restart helper is needed to apply these two settings. They are previewed, backed up, and restored through the existing normal Kodi settings flow. They influence which available tracks Kodi prefers, but the subtitle-language preference alone does not guarantee subtitles will be enabled for every video. No other Player or accessibility settings are changed.
