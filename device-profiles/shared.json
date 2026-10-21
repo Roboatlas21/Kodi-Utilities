@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 8,
+  "revision": 9,
   "changes": [
     {
       "type": "kodi_setting",
@@ -75,6 +75,11 @@
       "type": "kodi_setting",
       "id": "locale.subtitlelanguage",
       "value": "English"
+    },
+    {
+      "type": "advanced_setting",
+      "id": "videolibrary.recentlyaddeditems",
+      "value": 50
     }
   ]
 }
