@@ -1,4 +1,4 @@
-# Kodi Utilities — Device Setup (0.1.8)
+# Kodi Utilities — Device Setup (0.1.9)
 
 Manual CoreELEC 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
@@ -141,7 +141,7 @@ Device Setup reads the existing XML safely and changes **only** the approved `vi
 
 **A full CoreELEC reboot is needed to activate any new limit.** This update does **not** automatically restart Kodi or reboot the box for the limit. Existing HDMI-CEC changes retain their previously approved full-reboot workflow when a CEC action is also pending. Installing or updating the add-on never applies settings by itself.
 
-**Use Device Setup v0.1.8 or later before applying shared profile revision 9 or later.** Revision 10 is a profile-only update and does not require a new add-on release. Older versions reject unsupported operation types rather than silently applying a partial profile. No other existing shared setting changes.
+**Update Device Setup to v0.1.9 or later before applying shared profile revision 10 or later.** v0.1.8 supports only the previous shared limit of 50 and rejects the entire profile when it requests 25. v0.1.9 accepts both approved shared values (25 and 50). Other advanced-setting IDs and values remain rejected. No other existing shared setting changes.
 
 Offline tests: 47 tests (20 new XML/profile/apply/restore/Quick Settings cases plus the 27 existing CEC recovery regression tests), Python syntax compilation, shell syntax check, and ZIP archive integrity verification. Physical CoreELEC testing of this new XML workflow is still pending.
 
@@ -149,4 +149,12 @@ Offline tests: 47 tests (20 new XML/profile/apply/restore/Quick Settings cases p
 
 **Apply My Setup** sets **Settings → Media → Videos → Default select action** to **Show information**, using the normal Kodi setting `myvideos.selectaction` with integer value `3` (`ACTION_INFO`). This changes the default action when selecting a video to opening its information dialog. The separate **Default play action** setting is not changed.
 
-This is a shared-profile-only update supported by the existing Device Setup v0.1.8. The normal preview, confirmation, backup and restore flow applies; installing or updating the add-on does not apply the setting automatically. This setting takes effect without restarting Kodi.
+This is a normal Kodi setting supported by the existing apply flow. **Use Device Setup v0.1.9 or later for the current shared profile**, because v0.1.8 rejects its Recently Added limit of 25 before applying any settings, including this one. The normal preview, confirmation, backup and restore flow applies; installing or updating the add-on does not apply the setting automatically. This setting takes effect without restarting Kodi.
+
+## Shared-profile validation fix (v0.1.9)
+
+- Fixes the `Only Recently Added limit 50 is approved for shared profiles` error when applying the requested reset to 25 in shared profile revisions 10 and 11.
+- Keeps the shared profile at revision 11: Recently Added = 25 and Default select action = Show information. Update the add-on, then run **Apply My Setup** again. Reboot CoreELEC to activate a changed Recently Added limit; the select-action setting takes effect immediately.
+- Corrects Quick Settings text to refer to the shared profile's value instead of promising a reset to 50.
+- The CEC helper, XML backup/restore behavior, manual confirmation and no-auto-apply policy are unchanged.
+- Verified against the actual v0.1.9 ZIP and published revision 11: profile validation, applying and restoring both requested changes with mocked Kodi APIs, cancellation, rollback after a simulated Kodi rejection, unrelated XML preservation, and package/index integrity. Physical CoreELEC testing remains pending.
