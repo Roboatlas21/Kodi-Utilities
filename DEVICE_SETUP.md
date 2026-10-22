@@ -1,11 +1,11 @@
-# Kodi Utilities — Device Setup (0.1.13)
+# Kodi Utilities — Device Setup (0.1.14)
 
 Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
 ## Settings policy
 
 - The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 256 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, Default select action = Show information, timezone country = Canada / timezone = America/Toronto, temperature unit = Celsius, speed unit = km/h, and installation/selection of Open-Meteo as the weather provider (shared profile revision 15). All are applied only after confirmation.
-- Installing the add-on, opening it, and checking updates **never modify any Kodi settings**.
+- Installing or opening the add-on and **Check My Setup Status** never apply the shared setup. **Check All Add-on Updates** runs Kodi’s normal repository refresh and follows your existing automatic-update settings.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
 - Settings are backed up locally before writes; Restore Previous Settings can reverse the most recent reversible batch.
@@ -233,3 +233,9 @@ This is a shared-profile update supported by the existing Device Setup v0.1.12; 
 **Apply My Setup** now displays the complete, scrollable change list with **Apply** and **Cancel** buttons on the same screen. It no longer opens a separate text viewer before asking for confirmation. Back cancels without applying anything. The cache change is displayed as “Playback cache memory: 512 MB → 256 MB.”
 
 Update **Kodi Utilities - Device Setup** to **0.1.13** from the repository, then choose **Apply My Setup**. Updating the add-on does not apply settings automatically. Shared profile revision 15 remains unchanged. The separate **Preview GitHub Changes** menu remains read-only.
+
+## Add-on update check (0.1.14)
+
+The main menu now includes **Check All Add-on Updates**, which asks Kodi to check every enabled add-on repository using its built-in update check. A notification confirms that the check has started. Kodi handles available updates according to your existing automatic-update settings; this does not change those settings or apply the shared setup profile.
+
+The original **Check for Updates** entry is renamed **Check My Setup Status**. It still compares this box with the GitHub setup profile and reports unapplied changes.

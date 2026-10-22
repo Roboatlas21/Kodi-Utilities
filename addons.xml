@@ -22,7 +22,7 @@
     <description lang="en_GB">Cinema Controls</description>
     <platform>all</platform><license>MIT</license><minversion>21.0</minversion>
   </extension>
-</addon><addon id="script.kodi.utilities.setup" name="Kodi Utilities - Device Setup" version="0.1.13" provider-name="Kodi Utilities">
+</addon><addon id="script.kodi.utilities.setup" name="Kodi Utilities - Device Setup" version="0.1.14" provider-name="Kodi Utilities">
   <requires><import addon="xbmc.python" version="3.0.1" /></requires>
   <extension point="xbmc.python.script" library="default.py" />
   <extension point="xbmc.addon.metadata">
