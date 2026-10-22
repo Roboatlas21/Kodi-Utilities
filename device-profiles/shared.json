@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 15,
+  "revision": 16,
   "changes": [
     {
       "type": "kodi_setting",
@@ -85,6 +85,11 @@
       "type": "kodi_setting",
       "id": "myvideos.selectaction",
       "value": 3
+    },
+    {
+      "type": "kodi_setting",
+      "id": "filelists.showparentdiritems",
+      "value": false
     },
     {
       "type": "timezone_setting",

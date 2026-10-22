@@ -175,8 +175,8 @@ class PackageTests(unittest.TestCase):
     def test_package_profile_and_index(self):
         from resources.lib.profile import parse
         parsed = parse((ROOT/'device-profiles/shared.json').read_bytes())
-        self.assertEqual(parsed['revision'],15)
-        self.assertEqual(len(parsed['changes']),21)
+        self.assertEqual(parsed['revision'],16)
+        self.assertEqual(len(parsed['changes']),22)
         self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'videolibrary.recentlyaddeditems'),25)
         self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'myvideos.selectaction'),3)
         index = (ROOT/'addons.xml').read_bytes()
