@@ -4,7 +4,7 @@ Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Ko
 
 ## Settings policy
 
-- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 512 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, Default select action = Show information, timezone country = Canada / timezone = America/Toronto, temperature unit = Celsius, speed unit = km/h, and installation/selection of Open-Meteo as the weather provider (shared profile revision 14). All are applied only after confirmation.
+- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 256 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, Default select action = Show information, timezone country = Canada / timezone = America/Toronto, temperature unit = Celsius, speed unit = km/h, and installation/selection of Open-Meteo as the weather provider (shared profile revision 15). All are applied only after confirmation.
 - Installing the add-on, opening it, and checking updates **never modify any Kodi settings**.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
@@ -221,3 +221,9 @@ Fixes the reported `Open-Meteo refused to update loc1lon` error when selecting a
 Update Device Setup to **v0.1.12**, then choose the city again under **Quick Settings → Weather city**. No reboot is needed. Shared profile revision 14 and all three city presets are unchanged.
 
 Validation: the test fixture now reproduces Kodi's number serialization/reload and produced the exact reported longitude error against v0.1.11. All 33 checks pass against the v0.1.12 package, including all three presets and rollback when coordinate readback has the wrong sign, an invalid number, or the unchanged old value. Physical CoreELEC confirmation is pending.
+
+## Playback cache memory (shared profile revision 15)
+
+**Apply My Setup** now sets Kodi's playback cache memory to **256 MB**, reduced from 512 MB for testing intermittent playback-open failures. The cause of those failures is not yet confirmed. Buffer mode remains All filesystems, read factor remains Adaptive, and chunk size remains 256 KB.
+
+This is a shared-profile update supported by the existing Device Setup v0.1.12; no new add-on package is required. Open **Kodi Utilities - Device Setup → Apply My Setup**, review the cache-memory change, and confirm. The new size is used when opening the next playback session; no reboot is requested for this setting.

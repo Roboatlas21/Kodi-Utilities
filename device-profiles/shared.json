@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 14,
+  "revision": 15,
   "changes": [
     {
       "type": "kodi_setting",
@@ -16,7 +16,7 @@
     {
       "type": "kodi_setting",
       "id": "filecache.memorysize",
-      "value": 512
+      "value": 256
     },
     {
       "type": "kodi_setting",
