@@ -15,7 +15,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE = ROOT / 'script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.12.zip'
+PACKAGE = ROOT / 'script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.13.zip'
 SHARED = json.loads((ROOT / 'device-profiles/shared.json').read_text())
 TARGET = {'country': 'Canada', 'timezone': 'America/Toronto'}
 ORIGINAL = {'country': 'United States', 'timezone': 'America/New_York'}
@@ -41,11 +41,28 @@ class PackageTests(unittest.TestCase):
         self.install_commands = []
         self.weather_refreshes = 0
         self.fail_install = False
+        owner = self
+        class XMLDialogStub:
+            def __init__(self, *args):
+                self.controls = {1: Mock()}
+                self.close = Mock()
+                self.setFocusId = Mock()
+                owner.confirmation_window = self
+
+            def getControl(self, control_id):
+                return self.controls[control_id]
+
+            def doModal(self):
+                self.onInit()
+                message = self.controls[1].setText.call_args.args[0]
+                confirmed = owner.dialog.yesno('Apply My Setup', message)
+                self.onClick(10 if confirmed else 11)
+
         xbmc = types.SimpleNamespace(getInfoLabel=lambda key: '21.3',
             getCondVisibility=lambda key: key == 'System.HasAddon(weather.openmeteo)' and 'weather.openmeteo' in self.installed,
             executebuiltin=self.install, Monitor=lambda: types.SimpleNamespace(waitForAbort=lambda seconds: False),
             LOGERROR=4, LOGWARNING=3, log=Mock())
-        modules = {'xbmc': xbmc, 'xbmcgui': types.SimpleNamespace(Dialog=lambda: self.dialog),
+        modules = {'xbmc': xbmc, 'xbmcgui': types.SimpleNamespace(Dialog=lambda: self.dialog, WindowXMLDialog=XMLDialogStub),
                    'xbmcaddon': types.SimpleNamespace(Addon=Mock()),
                    'xbmcvfs': types.SimpleNamespace(translatePath=lambda path: str(self.data))}
         self.addCleanup(patch.stopall)
@@ -164,11 +181,15 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'myvideos.selectaction'),3)
         index = (ROOT/'addons.xml').read_bytes()
         self.assertEqual(hashlib.md5(index).hexdigest(),(ROOT/'addons.xml.md5').read_text())
-        self.assertEqual(ET.fromstring(index).find("addon[@id='script.kodi.utilities.setup']").get('version'),'0.1.12')
+        self.assertEqual(ET.fromstring(index).find("addon[@id='script.kodi.utilities.setup']").get('version'),'0.1.13')
         with zipfile.ZipFile(PACKAGE) as archive:
             self.assertIsNone(archive.testzip())
-            self.assertEqual(len(archive.namelist()),10)
-            self.assertEqual(ET.fromstring(archive.read('script.kodi.utilities.setup/addon.xml')).get('version'),'0.1.12')
+            self.assertEqual(len(archive.namelist()),12)
+            self.assertEqual(ET.fromstring(archive.read('script.kodi.utilities.setup/addon.xml')).get('version'),'0.1.13')
+            layout = ET.fromstring(archive.read('script.kodi.utilities.setup/resources/skins/default/720p/SetupConfirm.xml'))
+            self.assertEqual(layout.find(".//control[@id='1']/pagecontrol").text, '2')
+            self.assertEqual(layout.find(".//control[@id='10']/label").text, 'Apply')
+            self.assertEqual(layout.find(".//control[@id='11']/label").text, 'Cancel')
             for name in archive.namelist():
                 if name.endswith('.py'):
                     compile(archive.read(name),name,'exec')
@@ -214,6 +235,30 @@ class PackageTests(unittest.TestCase):
         self.assertFalse(self.writes or self.service_calls)
         self.assertFalse(self.install_commands)
         self.assertFalse(Path(self.app.ROLLBACK_FILE).exists())
+        self.dialog.textviewer.assert_not_called()
+
+    def test_apply_shows_change_and_applies_without_separate_preview(self):
+        self.profile['changes'] = [{'type': 'kodi_setting', 'id': 'filecache.memorysize', 'value': 256}]
+        self.values['filecache.memorysize'] = 512
+        self.app.apply()
+        message = self.dialog.yesno.call_args.args[1]
+        self.assertIn('512 MB', message)
+        self.assertIn('256 MB', message)
+        self.assertEqual(self.writes, [('filecache.memorysize', 256)])
+        self.dialog.textviewer.assert_not_called()
+        self.confirmation_window.close.assert_called_once()
+
+    def test_back_from_confirmation_changes_nothing(self):
+        for action_id in (9, 10, 92):
+            with self.subTest(action_id=action_id):
+                def back(window):
+                    window.onInit()
+                    window.onAction(types.SimpleNamespace(getId=lambda: action_id))
+                with patch.object(self.app.ApplyDialog, 'doModal', back):
+                    self.app.apply()
+                self.assertFalse(self.writes or self.service_calls or self.install_commands)
+                self.assertFalse(Path(self.app.ROLLBACK_FILE).exists())
+                self.confirmation_window.close.assert_called_once()
 
     def test_already_set_is_noop(self):
         self.only_timezone()
@@ -227,7 +272,7 @@ class PackageTests(unittest.TestCase):
         self.app.apply()
         self.assertEqual(self.pair(),TARGET)
         self.assertNotIn('filecache.chunksize',[key for key,value in self.writes])
-        self.assertIn('filecache.chunksize',self.dialog.textviewer.call_args.args[1])
+        self.assertIn('filecache.chunksize',self.dialog.yesno.call_args.args[1])
 
     def test_21_never_falls_back_to_native(self):
         self.only_timezone()

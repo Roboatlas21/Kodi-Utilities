@@ -1,4 +1,4 @@
-# Kodi Utilities — Device Setup (0.1.12)
+# Kodi Utilities — Device Setup (0.1.13)
 
 Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
@@ -20,7 +20,7 @@ Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Ko
 2. Choose **Kodi Utilities - Device Setup** from that repository.
 3. Open it from Kodi's **Program add-ons**.
 4. Choose **Quick Settings** to edit this box’s advertised name, Recently Added item limit, or weather city, or **Preview GitHub Changes** to inspect shared configuration changes.
-5. When you have asked AI to modify the public profile, use **Apply My Setup** after reading the exact changes.
+5. Choose **Apply My Setup**, review the changes, and select **Apply** on the same screen. **Cancel** or the remote Back button exits without changing settings. Press Up to focus the scrollbar for a long list; Left or Right returns to the buttons.
 
 Repository profile URL: https://raw.githubusercontent.com/Roboatlas21/Kodi-Utilities/main/device-profiles/shared.json
 
@@ -227,3 +227,9 @@ Validation: the test fixture now reproduces Kodi's number serialization/reload a
 **Apply My Setup** now sets Kodi's playback cache memory to **256 MB**, reduced from 512 MB for testing intermittent playback-open failures. The cause of those failures is not yet confirmed. Buffer mode remains All filesystems, read factor remains Adaptive, and chunk size remains 256 KB.
 
 This is a shared-profile update supported by the existing Device Setup v0.1.12; no new add-on package is required. Open **Kodi Utilities - Device Setup → Apply My Setup**, review the cache-memory change, and confirm. The new size is used when opening the next playback session; no reboot is requested for this setting.
+
+## Apply confirmation (0.1.13)
+
+**Apply My Setup** now displays the complete, scrollable change list with **Apply** and **Cancel** buttons on the same screen. It no longer opens a separate text viewer before asking for confirmation. Back cancels without applying anything. The cache change is displayed as “Playback cache memory: 512 MB → 256 MB.”
+
+Update **Kodi Utilities - Device Setup** to **0.1.13** from the repository, then choose **Apply My Setup**. Updating the add-on does not apply settings automatically. Shared profile revision 15 remains unchanged. The separate **Preview GitHub Changes** menu remains read-only.
