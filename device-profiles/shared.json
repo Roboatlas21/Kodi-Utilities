@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "profile": "shared",
-  "revision": 18,
+  "revision": 19,
   "changes": [
     {
       "type": "kodi_setting",
@@ -17,6 +17,11 @@
       "type": "kodi_setting",
       "id": "filecache.memorysize",
       "value": 64
+    },
+    {
+      "type": "kodi_setting",
+      "id": "coreelec.amlogic.disableguiscaling",
+      "value": true
     },
     {
       "type": "kodi_setting",

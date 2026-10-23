@@ -1,10 +1,10 @@
-# Kodi Utilities — Device Setup (0.1.14)
+# Kodi Utilities — Device Setup (0.1.15)
 
 Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
 ## Settings policy
 
-- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 64 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, Default select action = Show information, timezone country = Canada / timezone = America/Toronto, temperature unit = Celsius, speed unit = km/h, and installation/selection of Open-Meteo as the weather provider, and Show parent folder items = Off (shared profile revision 18). All are applied only after confirmation.
+- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 64 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, Default select action = Show information, timezone country = Canada / timezone = America/Toronto, temperature unit = Celsius, speed unit = km/h, and installation/selection of Open-Meteo as the weather provider, and Show parent folder items = Off, and native GUI scaling disabled where supported (shared profile revision 19). All are applied only after confirmation.
 - Installing or opening the add-on and **Check My Setup Status** never apply the shared setup. **Check All Add-on Updates** runs Kodi’s normal repository refresh and follows your existing automatic-update settings.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
@@ -257,3 +257,11 @@ This is a shared-profile update supported by the existing Device Setup 0.1.14 ad
 **Apply My Setup** now sets Kodi's playback memory cache to **64 MB**, reduced from 128 MB to further limit memory allocation pressure on the 32-bit CoreELEC 21 Kodi process. Restarting Kodi has historically restored playback when it fails after extended use; a smaller cache may postpone the recurrence but is not a confirmed fix for underlying memory growth or fragmentation. Buffer mode remains All filesystems, read factor remains Adaptive, and chunk size remains 256 KB.
 
 This change is delivered through the shared profile and works with the existing Device Setup 0.1.14 add-on; no new add-on ZIP is required. On each box, open **Kodi Utilities - Device Setup → Apply My Setup**, review **Playback cache memory: 128 MB → 64 MB**, and select **Apply**. Settings are not applied automatically. The new cache size is used for the next playback session; restarting Kodi is not required to apply the setting.
+
+## Native 4K GUI and local resolution selection (0.1.15; shared profile revision 19)
+
+The shared **Apply My Setup** profile enables Kodi's **Disable GUI scaling** setting (`coreelec.amlogic.disableguiscaling = true`) where the installed CoreELEC/Kodi build exposes it. This is supported by pannal's T4d development code. T4c hides the setting, so the add-on skips it rather than forcing it. The shared profile does not set display output resolution, which must remain device-local.
+
+Open **Kodi Utilities - Device Setup → Quick Settings → Display resolution: 1080p / 4K** to change the device's **Settings → System → Display → General → Resolution**. The picker enumerates Kodi's runtime `videoscreen.resolution` options, permits 1920×1080 or 3840×2160 only if Kodi offers them, and asks for confirmation. Kodi's own temporary keep/revert display prompt applies. The picker never guesses resolution IDs or edits the shared GitHub profile.
+
+For native 4K Arctic Fuse 3 rendering on a supporting T4d build, apply the shared setup, then select the 4K output resolution on the device. To return to a 1080p output, use the same Quick Setting; nothing applies automatically.
