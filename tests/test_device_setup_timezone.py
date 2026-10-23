@@ -175,9 +175,10 @@ class PackageTests(unittest.TestCase):
     def test_package_profile_and_index(self):
         from resources.lib.profile import parse
         parsed = parse((ROOT/'device-profiles/shared.json').read_bytes())
-        self.assertEqual(parsed['revision'],16)
+        self.assertEqual(parsed['revision'],17)
         self.assertEqual(len(parsed['changes']),22)
         self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'videolibrary.recentlyaddeditems'),25)
+        self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'filecache.memorysize'),128)
         self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'myvideos.selectaction'),3)
         index = (ROOT/'addons.xml').read_bytes()
         self.assertEqual(hashlib.md5(index).hexdigest(),(ROOT/'addons.xml.md5').read_text())
@@ -238,13 +239,13 @@ class PackageTests(unittest.TestCase):
         self.dialog.textviewer.assert_not_called()
 
     def test_apply_shows_change_and_applies_without_separate_preview(self):
-        self.profile['changes'] = [{'type': 'kodi_setting', 'id': 'filecache.memorysize', 'value': 256}]
-        self.values['filecache.memorysize'] = 512
+        self.profile['changes'] = [{'type': 'kodi_setting', 'id': 'filecache.memorysize', 'value': 128}]
+        self.values['filecache.memorysize'] = 256
         self.app.apply()
         message = self.dialog.yesno.call_args.args[1]
-        self.assertIn('512 MB', message)
         self.assertIn('256 MB', message)
-        self.assertEqual(self.writes, [('filecache.memorysize', 256)])
+        self.assertIn('128 MB', message)
+        self.assertEqual(self.writes, [('filecache.memorysize', 128)])
         self.dialog.textviewer.assert_not_called()
         self.confirmation_window.close.assert_called_once()
 

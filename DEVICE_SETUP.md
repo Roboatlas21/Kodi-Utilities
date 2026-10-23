@@ -4,7 +4,7 @@ Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Ko
 
 ## Settings policy
 
-- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 256 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, Default select action = Show information, timezone country = Canada / timezone = America/Toronto, temperature unit = Celsius, speed unit = km/h, and installation/selection of Open-Meteo as the weather provider, and Show parent folder items = Off (shared profile revision 16). All are applied only after confirmation.
+- The public profile `device-profiles/shared.json` contains **only explicitly approved operations**. The approved shared profile contains Screensaver mode = None, four Kodi cache settings (all filesystems, 128 MB, Adaptive, 256 KB), two File Manager sources (Jellyfin and Jurialmunkey), three Jellyfin for Kodi settings (cinema mode on, segment skipping on, recap skip button), two HDMI-CEC Stop Playback actions, preferred English audio and subtitle languages, the native Kodi Recently Added items limit of 25, Default select action = Show information, timezone country = Canada / timezone = America/Toronto, temperature unit = Celsius, speed unit = km/h, and installation/selection of Open-Meteo as the weather provider, and Show parent folder items = Off (shared profile revision 17). All are applied only after confirmation.
 - Installing or opening the add-on and **Check My Setup Status** never apply the shared setup. **Check All Add-on Updates** runs Kodi’s normal repository refresh and follows your existing automatic-update settings.
 - Only operations intentionally placed in the profile can be applied.
 - Apply first shows the exact differences and requires confirmation.
@@ -245,3 +245,9 @@ The original **Check for Updates** entry is renamed **Check My Setup Status**. I
 **Apply My Setup** now turns off **Settings → Media → General → Show parent folder items**, using Kodi’s `filelists.showparentdiritems` setting with boolean `false`. This hides the `..` parent-folder arrow tiles in Kodi lists, including Arctic Fuse 3. Use the remote’s Back button to return to the previous screen. This is a Kodi-wide preference, not a skin-only override.
 
 The existing Device Setup add-on supports this profile change; no add-on update is required. Open **Apply My Setup** and confirm **Apply** to use the new default on each box. Shared profile revision 16 keeps playback cache memory at 256 MB.
+
+## Playback cache memory (shared profile revision 17)
+
+**Apply My Setup** now sets Kodi's playback cache to **128 MB**, down from 256 MB. This is to reduce the risk of playback-open failures when the 32-bit Kodi process cannot allocate a contiguous cache buffer; the exact cause of the reported failures has not been confirmed. Buffer mode (All filesystems), read factor (Adaptive), and chunk size (256 KB) are unchanged.
+
+This is a shared-profile update supported by the existing Device Setup 0.1.14 add-on, so no new ZIP or add-on upgrade is required. On each CoreELEC box, open **Kodi Utilities - Device Setup → Apply My Setup**, review the proposed change (**Playback cache memory: 256 MB → 128 MB**), and select **Apply**. Nothing is applied automatically. The new cache size is used the next time playback opens; a reboot is not required to apply this setting.
