@@ -1,4 +1,4 @@
-# Kodi Utilities — Device Setup (0.1.15)
+# Kodi Utilities — Device Setup (0.1.16)
 
 Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
@@ -265,3 +265,7 @@ The shared **Apply My Setup** profile enables Kodi's **Disable GUI scaling** set
 Open **Kodi Utilities - Device Setup → Quick Settings → Display resolution: 1080p / 4K** to change the device's **Settings → System → Display → General → Resolution**. The picker enumerates Kodi's runtime `videoscreen.resolution` options, permits 1920×1080 or 3840×2160 only if Kodi offers them, and asks for confirmation. Kodi's own temporary keep/revert display prompt applies. The picker never guesses resolution IDs or edits the shared GitHub profile.
 
 For native 4K Arctic Fuse 3 rendering on a supporting T4d build, apply the shared setup, then select the 4K output resolution on the device. To return to a 1080p output, use the same Quick Setting; nothing applies automatically.
+
+## Reboot warning for native 4K GUI changes (0.1.16)
+
+When **Apply My Setup** changes **Disable GUI scaling**, its change preview and success message now say **Reboot CoreELEC to apply this change**. Restoring the setting displays a reboot warning before confirmation and again after restoration. The warning appears only if the setting is actually changed, not when it was already correct or is unavailable on an older build. There is no automatic reboot. Shared profile revision 19 and the 64 MB playback cache remain unchanged.

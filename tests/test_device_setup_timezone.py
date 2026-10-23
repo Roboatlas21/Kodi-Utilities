@@ -15,7 +15,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE = ROOT / 'script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.15.zip'
+PACKAGE = ROOT / 'script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.16.zip'
 SHARED = json.loads((ROOT / 'device-profiles/shared.json').read_text())
 TARGET = {'country': 'Canada', 'timezone': 'America/Toronto'}
 ORIGINAL = {'country': 'United States', 'timezone': 'America/New_York'}
@@ -183,11 +183,11 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'myvideos.selectaction'),3)
         index = (ROOT/'addons.xml').read_bytes()
         self.assertEqual(hashlib.md5(index).hexdigest(),(ROOT/'addons.xml.md5').read_text())
-        self.assertEqual(ET.fromstring(index).find("addon[@id='script.kodi.utilities.setup']").get('version'),'0.1.15')
+        self.assertEqual(ET.fromstring(index).find("addon[@id='script.kodi.utilities.setup']").get('version'),'0.1.16')
         with zipfile.ZipFile(PACKAGE) as archive:
             self.assertIsNone(archive.testzip())
             self.assertEqual(len(archive.namelist()),13)
-            self.assertEqual(ET.fromstring(archive.read('script.kodi.utilities.setup/addon.xml')).get('version'),'0.1.15')
+            self.assertEqual(ET.fromstring(archive.read('script.kodi.utilities.setup/addon.xml')).get('version'),'0.1.16')
             layout = ET.fromstring(archive.read('script.kodi.utilities.setup/resources/skins/default/720p/SetupConfirm.xml'))
             self.assertEqual(layout.find(".//control[@id='1']/pagecontrol").text, '2')
             self.assertEqual(layout.find(".//control[@id='10']/label").text, 'Apply')
@@ -249,6 +249,51 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(self.writes, [('filecache.memorysize', 64)])
         self.dialog.textviewer.assert_not_called()
         self.confirmation_window.close.assert_called_once()
+
+
+    def test_gui_scaling_reboot_notice_on_apply(self):
+        key = self.app.NATIVE_GUI_SETTING
+        self.profile['changes'] = [{'type':'kodi_setting','id':key,'value':True}]
+        self.values[key] = False
+        self.app.apply()
+        self.assertIn('Disable GUI scaling', self.dialog.yesno.call_args.args[1])
+        self.assertIn('Reboot CoreELEC', self.dialog.yesno.call_args.args[1])
+        self.assertIn('Reboot CoreELEC', self.dialog.ok.call_args.args[1])
+        self.assertEqual(self.writes, [(key, True)])
+
+        # Reapplying an unchanged setting should not warn.
+        self.dialog.reset_mock()
+        self.app.apply()
+        self.dialog.yesno.assert_not_called()
+        self.assertNotIn('Reboot CoreELEC', self.dialog.ok.call_args.args[1])
+
+    def test_gui_scaling_reboot_notice_on_restore(self):
+        key = self.app.NATIVE_GUI_SETTING
+        self.profile['changes'] = [{'type':'kodi_setting','id':key,'value':True}]
+        self.values[key] = False
+        self.app.apply()
+        self.dialog.reset_mock()
+        self.app.restore()
+        self.assertIn('Reboot CoreELEC', self.dialog.textviewer.call_args.args[1])
+        self.assertIn('Reboot CoreELEC', self.dialog.yesno.call_args.args[1])
+        self.assertIn('Reboot CoreELEC', self.dialog.ok.call_args.args[1])
+        self.assertIs(self.values[key], False)
+
+    def test_unsupported_gui_setting_does_not_warn(self):
+        key = self.app.NATIVE_GUI_SETTING
+        self.profile['changes'] = [{'type':'kodi_setting','id':key,'value':True}]
+        self.missing.add(key)
+        self.app.apply()
+        self.assertFalse(self.writes)
+        self.dialog.yesno.assert_not_called()
+        self.assertNotIn('Reboot CoreELEC', self.dialog.ok.call_args.args[1])
+
+    def test_unrelated_setting_does_not_warn_about_reboot(self):
+        self.profile['changes'] = [{'type':'kodi_setting','id':'filecache.memorysize','value':64}]
+        self.values['filecache.memorysize'] = 128
+        self.app.apply()
+        self.assertNotIn('Reboot CoreELEC', self.dialog.yesno.call_args.args[1])
+        self.assertNotIn('Reboot CoreELEC', self.dialog.ok.call_args.args[1])
 
     def test_back_from_confirmation_changes_nothing(self):
         for action_id in (9, 10, 92):
