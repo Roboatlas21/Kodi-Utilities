@@ -1,4 +1,4 @@
-# Kodi Utilities — Device Setup (0.1.16)
+# Kodi Utilities — Device Setup (0.1.17)
 
 Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
@@ -269,3 +269,33 @@ For native 4K Arctic Fuse 3 rendering on a supporting T4d build, apply the share
 ## Reboot warning for native 4K GUI changes (0.1.16)
 
 When **Apply My Setup** changes **Disable GUI scaling**, its change preview and success message now say **Reboot CoreELEC to apply this change**. Restoring the setting displays a reboot warning before confirmation and again after restoration. The warning appears only if the setting is actually changed, not when it was already correct or is unavailable on an older build. There is no automatic reboot. Shared profile revision 19 and the 64 MB playback cache remain unchanged.
+
+
+## Native 4K GUI font fix (v0.1.17)
+
+**Quick Settings → Native 4K GUI font fix: Install / Uninstall** provides a device-local,
+explicitly confirmed workaround for stray apostrophe-like pixels around Kodi text with
+native 4K GUI rendering (pannal/xbmc PR #115). It does not modify the shared profile
+or automatically apply when the add-on is installed or updated.
+
+- Install checks for the expected GLES GUI font shader, then adds a clearly marked,
+  synchronous hook to `/storage/.config/autostart.sh`. CoreELEC runs this script
+  before Kodi starts. Existing startup commands and executable permissions are preserved.
+- The hook runs a small, locally stored shell helper that changes only the original
+  `varying vec4 m_cord0;` declaration into the tested highp/mediump fallback.
+  It binds that generated copy over the read-only shader for this boot. **No network
+  access or entire older shader file is needed.** An already corrected system shader
+  is left untouched.
+- Install tries applying the patch immediately if the original shader is in use.
+  **Restart Kodi** to reload it. If a previous manual SSH test mount is active,
+  Install leaves that external mount alone and prepares the startup hook for next boot.
+- Uninstall removes only the marked startup hook and owned helper files; it unmounts
+  the shader only if its own generated copy is mounted. Existing startup customizations
+  and unrelated mounts are preserved. Restart Kodi afterward; reboot CoreELEC to clear
+  an earlier manual test mount if one was already active.
+- Modified hooks or unknown scripts are rejected rather than overwritten. Changes to
+  autostart.sh are written atomically. The feature is **opt-in**, **local to each box**,
+  and does not restart Kodi or reboot CoreELEC automatically.
+- Ten isolated Python/shell regression cases cover preserving startup scripts,
+  idempotency, unknown-file refusal, shader generation, patched-upstream handling,
+  and unmounting only this fix's own overlay. Device installation testing is pending.

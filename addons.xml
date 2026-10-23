@@ -22,12 +22,12 @@
     <description lang="en_GB">Cinema Controls</description>
     <platform>all</platform><license>MIT</license><minversion>21.0</minversion>
   </extension>
-</addon><addon id="script.kodi.utilities.setup" name="Kodi Utilities - Device Setup" version="0.1.16" provider-name="Kodi Utilities">
+</addon><addon id="script.kodi.utilities.setup" name="Kodi Utilities - Device Setup" version="0.1.17" provider-name="Kodi Utilities">
   <requires><import addon="xbmc.python" version="3.0.1" /></requires>
   <extension point="xbmc.python.script" library="default.py" />
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">Quick local settings and approved GitHub configuration</summary>
-    <description lang="en_GB">Quick Settings for device name, weather city, display resolution and Recently Added items; preview, apply, and restore approved Kodi settings from GitHub. Nothing runs automatically.</description>
+    <description lang="en_GB">Quick local settings and an optional persistent native 4K GUI font fix; preview, apply, and restore approved Kodi settings. Shared profile settings never run automatically.</description>
     <platform>all</platform><license>MIT</license><minversion>21.0</minversion>
   </extension>
 </addon></addons>
