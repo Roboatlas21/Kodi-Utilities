@@ -1,4 +1,4 @@
-# Kodi Utilities — Device Setup (0.1.17)
+# Kodi Utilities — Device Setup (0.1.18)
 
 Manual CoreELEC 21 / 22 / Kodi configuration replication through the existing Kodi Utilities add-on repository.
 
@@ -299,3 +299,22 @@ or automatically apply when the add-on is installed or updated.
 - Ten isolated Python/shell regression cases cover preserving startup scripts,
   idempotency, unknown-file refusal, shader generation, patched-upstream handling,
   and unmounting only this fix's own overlay. Device installation testing is pending.
+
+
+## Subtitle size Quick Setting (v0.1.18)
+
+**Quick Settings → Subtitle size** offers only **Default (42)** and **32**, independently
+on each Kodi box. Kodi's `subtitles.fontsize` setting defaults to 42 pixels on
+CoreELEC/Kodi 21, 22 and 23; the selected 32-pixel value is within Kodi's
+12–74 even-integer range.
+
+The menu displays the current value, including a custom value if set manually
+outside Kodi Utilities. Choosing either option writes only `subtitles.fontsize`
+through Kodi's standard `Settings.SetSettingValue` JSON-RPC and confirms the
+result by reading it back. It does not affect font family, style, border, colour,
+position or the shared GitHub profile. Cancel and selecting the current size do
+nothing. Future **Apply My Setup** operations will not overwrite this local
+preference, and **Restore Previous Settings** does not roll it back.
+
+Tests cover switching to 32, restoring Kodi's default 42, cancel/no-op and
+custom values, failure handling, menu placement and profile independence.

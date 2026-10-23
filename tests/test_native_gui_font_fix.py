@@ -9,7 +9,7 @@ from unittest import mock
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE = ROOT / "script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.17.zip"
+PACKAGE = ROOT / "script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.18.zip"
 ENTRY = "script.kodi.utilities.setup/resources/lib/native_gui_font.py"
 with zipfile.ZipFile(PACKAGE) as archive:
     source = archive.read(ENTRY)

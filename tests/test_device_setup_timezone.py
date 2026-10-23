@@ -15,7 +15,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE = ROOT / 'script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.17.zip'
+PACKAGE = ROOT / 'script.kodi.utilities.setup/script.kodi.utilities.setup-0.1.18.zip'
 SHARED = json.loads((ROOT / 'device-profiles/shared.json').read_text())
 TARGET = {'country': 'Canada', 'timezone': 'America/Toronto'}
 ORIGINAL = {'country': 'United States', 'timezone': 'America/New_York'}
@@ -91,6 +91,7 @@ class PackageTests(unittest.TestCase):
         self.missing = set()
         self.values = {item['id']: 'old' for item in SHARED['changes'] if item['type']=='kodi_setting'}
         self.values['weather.addon'] = ''
+        self.values['subtitles.fontsize'] = 42
         self.values.update({self.tz.COUNTRY_ID: ORIGINAL['country'], self.tz.ZONE_ID: ORIGINAL['timezone']})
         self.writes = []
         self.service_calls = []
@@ -183,11 +184,11 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(next(item['value'] for item in parsed['changes'] if item.get('id') == 'myvideos.selectaction'),3)
         index = (ROOT/'addons.xml').read_bytes()
         self.assertEqual(hashlib.md5(index).hexdigest(),(ROOT/'addons.xml.md5').read_text())
-        self.assertEqual(ET.fromstring(index).find("addon[@id='script.kodi.utilities.setup']").get('version'),'0.1.16')
+        self.assertEqual(ET.fromstring(index).find("addon[@id='script.kodi.utilities.setup']").get('version'),'0.1.18')
         with zipfile.ZipFile(PACKAGE) as archive:
             self.assertIsNone(archive.testzip())
-            self.assertEqual(len(archive.namelist()),13)
-            self.assertEqual(ET.fromstring(archive.read('script.kodi.utilities.setup/addon.xml')).get('version'),'0.1.16')
+            self.assertEqual(len(archive.namelist()),14)
+            self.assertEqual(ET.fromstring(archive.read('script.kodi.utilities.setup/addon.xml')).get('version'),'0.1.18')
             layout = ET.fromstring(archive.read('script.kodi.utilities.setup/resources/skins/default/720p/SetupConfirm.xml'))
             self.assertEqual(layout.find(".//control[@id='1']/pagecontrol").text, '2')
             self.assertEqual(layout.find(".//control[@id='10']/label").text, 'Apply')
@@ -195,6 +196,53 @@ class PackageTests(unittest.TestCase):
             for name in archive.namelist():
                 if name.endswith('.py'):
                     compile(archive.read(name),name,'exec')
+
+
+    def test_subtitle_quick_setting_32(self):
+        self.dialog.select.side_effect = [4, 1]
+        self.app.quick_settings()
+        self.assertEqual(self.values['subtitles.fontsize'], 32)
+        self.assertEqual(self.writes, [('subtitles.fontsize', 32)])
+        menu = self.dialog.select.call_args_list[0]
+        self.assertIn('Subtitle size: Default (42)', menu.args[1])
+        picker = self.dialog.select.call_args_list[1]
+        self.assertEqual(picker.args[1], ['Default (42)', '32'])
+        self.assertEqual(picker.kwargs['preselect'], 0)
+        self.assertFalse(Path(self.app.ROLLBACK_FILE).exists())
+
+    def test_subtitle_quick_setting_restore_default(self):
+        self.values['subtitles.fontsize'] = 32
+        self.dialog.select.return_value = 0
+        self.app.edit_subtitle_size()
+        self.assertEqual(self.values['subtitles.fontsize'], 42)
+        self.assertEqual(self.writes, [('subtitles.fontsize', 42)])
+        self.assertEqual(self.dialog.select.call_args.kwargs['preselect'], 1)
+
+    def test_subtitle_quick_setting_cancel_noop_and_custom(self):
+        self.values['subtitles.fontsize'] = 36
+        self.dialog.select.return_value = -1
+        self.app.edit_subtitle_size()
+        self.assertEqual(self.dialog.select.call_args.kwargs['preselect'], -1)
+        self.assertFalse(self.writes)
+        self.assertEqual(self.app.subtitle_size_label(36), '36 (custom)')
+        self.assertEqual(self.app.subtitle_size_label(42), 'Default (42)')
+        self.assertEqual(self.app.subtitle_size_label(32), '32')
+        self.values['subtitles.fontsize'] = 32
+        self.dialog.select.return_value = 1
+        self.app.edit_subtitle_size()
+        self.assertFalse(self.writes)
+
+    def test_subtitle_quick_setting_failed_write_preserves_old_value(self):
+        self.fail_setting = ('subtitles.fontsize', 32)
+        self.dialog.select.return_value = 1
+        with self.assertRaisesRegex(RuntimeError, 'refused to update'):
+            self.app.edit_subtitle_size()
+        self.assertEqual(self.values['subtitles.fontsize'], 42)
+        self.assertFalse(Path(self.app.ROLLBACK_FILE).exists())
+
+    def test_subtitle_quick_setting_is_not_part_of_shared_profile(self):
+        self.assertFalse(any(item.get('id') == 'subtitles.fontsize'
+                             for item in SHARED['changes']))
 
     def test_full_profile_apply_and_restore_21(self):
         before = dict(self.values)
