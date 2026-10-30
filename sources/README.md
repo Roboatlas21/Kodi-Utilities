@@ -123,3 +123,8 @@ Corresponding source: [script.luna.ng-2.7.1.303-source.tar.gz](script.luna.ng-2.
 ## Luna NG 2.7.1.304
 
 Corresponding source: [script.luna.ng-2.7.1.304-source.tar.gz](script.luna.ng-2.7.1.304-source.tar.gz). Add-on ZIP: [script.luna.ng-2.7.1.304.zip](../script.luna.ng/script.luna.ng-2.7.1.304.zip). Includes the matching Luna frontend, native Moonlight source with submodules, and the build/repackaging scripts.
+
+
+## Luna NG 2.7.1.305
+
+Corresponding source: [script.luna.ng-2.7.1.305-source.tar.gz](script.luna.ng-2.7.1.305-source.tar.gz). Add-on ZIP: [script.luna.ng-2.7.1.305.zip](../script.luna.ng/script.luna.ng-2.7.1.305.zip). Includes the matching Luna frontend, native Moonlight source with submodules, and the build/repackaging scripts.
