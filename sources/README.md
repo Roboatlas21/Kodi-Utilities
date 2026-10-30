@@ -106,3 +106,10 @@ and exact public Linux kernel source links.
 Corresponding source: [script.luna.ng-2.7.1.301-source.tar.gz](script.luna.ng-2.7.1.301-source.tar.gz). Add-on ZIP: [script.luna.ng-2.7.1.301.zip](../script.luna.ng/script.luna.ng-2.7.1.301.zip). Includes the matching Luna frontend, native Moonlight source with submodules, and the build/repackaging scripts.
 
 Built from [public run #9](https://github.com/Roboatlas21/xbmc-p3i/actions/runs/40730063227). Includes the VFM decoder activation fix, optional TV Game Mode with restoration, and pairing timeout/error-reporting fixes. Reboot once after installing if the previous VFM bridge was already loaded. Hardware validation remains pending.
+
+
+## Luna NG 2.7.1.302
+
+Corresponding source: [script.luna.ng-2.7.1.302-source.tar.gz](script.luna.ng-2.7.1.302-source.tar.gz). Add-on ZIP: [script.luna.ng-2.7.1.302.zip](../script.luna.ng/script.luna.ng-2.7.1.302.zip). Includes the matching Luna frontend, native Moonlight source with submodules, and the build/repackaging scripts.
+
+Built from [public run #41082699584](https://github.com/Roboatlas21/Luna-build/actions/runs/41082699584). Includes session recovery, input, audio and startup fixes. Host validation, ARM32 compilation and VFM runtime smoke tests passed. AML remains the default pipeline; existing settings are retained.
