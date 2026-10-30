@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<addons><addon id="repository.kodi.utilities" name="Kodi Utilities" version="1.0.0" provider-name="Kodi Utilities">
+  <requires><import addon="xbmc.addon" version="20.0.0" /></requires>
+  <extension point="xbmc.addon.repository" name="Kodi Utilities">
+    <dir minversion="21.0.0">
+      <info>https://raw.githubusercontent.com/Roboatlas21/Kodi-Utilities/main/addons.xml</info>
+      <checksum>https://raw.githubusercontent.com/Roboatlas21/Kodi-Utilities/main/addons.xml.md5</checksum>
+      <datadir>https://raw.githubusercontent.com/Roboatlas21/Kodi-Utilities/main/</datadir>
+      <hashes>false</hashes>
+    </dir>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Kodi Utilities</summary>
+    <description lang="en_GB">Kodi Utilities</description>
+    <platform>all</platform><license>MIT</license>
+  </extension>
+</addon><addon id="service.cinema.controls" name="Cinema Controls" version="0.1.14" provider-name="Kodi Utilities">
+  <requires><import addon="xbmc.python" version="3.0.1" /><import addon="plugin.video.jellyfin" version="1.0.0" /></requires>
+  <extension point="xbmc.service" library="service.py" />
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Cinema Controls</summary>
+    <description lang="en_GB">Cinema Controls</description>
+    <platform>all</platform><license>MIT</license><minversion>21.0</minversion>
+  </extension>
+</addon><addon id="script.kodi.utilities.setup" name="Kodi Utilities - Device Setup" version="0.1.38" provider-name="Kodi Utilities">
+  <requires>
+    <import addon="xbmc.python" version="3.0.1" />
+  </requires>
+  <extension point="xbmc.python.script" library="default.py" />
+  <extension point="xbmc.service" library="service.py" />
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Quick local settings and approved GitHub configuration</summary>
+    <description lang="en_GB">Quick local device, subtitle size and startup title settings; preview, apply and restore approved Kodi settings. Shared profile settings never run automatically.</description>
+    <platform>all</platform>
+    <license>MIT</license>
+    <minversion>21.0</minversion>
+  </extension>
+</addon><addon id="script.luna.ng" name="Luna NG (CoreELEC 21 ARM32 test)" version="2.7.1.301" provider-name="Vortex, Roboatlas21">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0" />
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>executable game</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>linux</platform>
+    <language>en</language>
+    <summary lang="en_GB">Moonlight Launcher for Kodi</summary>
+    <description lang="en_GB">Luna Moonlight streaming for CoreELEC 21 NG 32-bit ARM only. Experimental test build; not compatible with CoreELEC 22 NO ARM64.</description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  <license>GPL-3.0-or-later</license><minversion>21.0</minversion></extension>
+</addon></addons>

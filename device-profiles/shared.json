@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "profile": "shared",
+  "revision": 20,
+  "changes": [
+    {
+      "type": "kodi_setting",
+      "id": "screensaver.mode",
+      "value": ""
+    },
+    {
+      "type": "kodi_setting",
+      "id": "filecache.buffermode",
+      "value": 1
+    },
+    {
+      "type": "kodi_setting",
+      "id": "filecache.memorysize",
+      "value": 64
+    },
+    {
+      "type": "kodi_setting",
+      "id": "coreelec.amlogic.disableguiscaling",
+      "value": true
+    },
+    {
+      "type": "kodi_setting",
+      "id": "filecache.readfactor",
+      "value": 0
+    },
+    {
+      "type": "kodi_setting",
+      "id": "filecache.chunksize",
+      "value": 262144
+    },
+    {
+      "type": "file_source",
+      "name": "Jellyfin Repo",
+      "path": "https://kodi.jellyfin.org/"
+    },
+    {
+      "type": "file_source",
+      "name": "Jurialmunkey Repo",
+      "path": "https://jurialmunkey.github.io/repository.jurialmunkey/"
+    },
+    {
+      "type": "addon_setting",
+      "addon_id": "plugin.video.jellyfin",
+      "id": "startupDelay",
+      "value": 5
+    },
+    {
+      "type": "addon_setting",
+      "addon_id": "plugin.video.jellyfin",
+      "id": "enableCinema",
+      "value": true
+    },
+    {
+      "type": "addon_setting",
+      "addon_id": "plugin.video.jellyfin",
+      "id": "mediaSegmentsEnabled",
+      "value": true
+    },
+    {
+      "type": "addon_setting",
+      "addon_id": "plugin.video.jellyfin",
+      "id": "skipRecapMode",
+      "value": 2
+    },
+    {
+      "type": "cec_setting",
+      "id": "standby_pc_on_tv_standby",
+      "value": 36044
+    },
+    {
+      "type": "cec_setting",
+      "id": "pause_or_stop_playback_on_deactivate",
+      "value": 36044
+    },
+    {
+      "type": "kodi_setting",
+      "id": "locale.audiolanguage",
+      "value": "English"
+    },
+    {
+      "type": "kodi_setting",
+      "id": "locale.subtitlelanguage",
+      "value": "English"
+    },
+    {
+      "type": "advanced_setting",
+      "id": "videolibrary.recentlyaddeditems",
+      "value": 25
+    },
+    {
+      "type": "kodi_setting",
+      "id": "myvideos.selectaction",
+      "value": 3
+    },
+    {
+      "type": "kodi_setting",
+      "id": "filelists.showparentdiritems",
+      "value": false
+    },
+    {
+      "type": "timezone_setting",
+      "id": "timezone",
+      "value": {
+        "country": "Canada",
+        "timezone": "America/Toronto"
+      }
+    },
+    {
+      "type": "kodi_setting",
+      "id": "locale.temperatureunit",
+      "value": "c"
+    },
+    {
+      "type": "kodi_setting",
+      "id": "locale.speedunit",
+      "value": "kmh"
+    },
+    {
+      "type": "install_addon",
+      "id": "weather.openmeteo"
+    },
+    {
+      "type": "kodi_setting",
+      "id": "weather.addon",
+      "value": "weather.openmeteo"
+    }
+  ]
+}
