@@ -113,3 +113,8 @@ Built from [public run #9](https://github.com/Roboatlas21/xbmc-p3i/actions/runs/
 Corresponding source: [script.luna.ng-2.7.1.302-source.tar.gz](script.luna.ng-2.7.1.302-source.tar.gz). Add-on ZIP: [script.luna.ng-2.7.1.302.zip](../script.luna.ng/script.luna.ng-2.7.1.302.zip). Includes the matching Luna frontend, native Moonlight source with submodules, and the build/repackaging scripts.
 
 Built from [public run #41082699584](https://github.com/Roboatlas21/Luna-build/actions/runs/41082699584). Includes session recovery, input, audio and startup fixes. Host validation, ARM32 compilation and VFM runtime smoke tests passed. AML remains the default pipeline; existing settings are retained.
+
+
+## Luna NG 2.7.1.303
+
+Corresponding source: [script.luna.ng-2.7.1.303-source.tar.gz](script.luna.ng-2.7.1.303-source.tar.gz). Add-on ZIP: [script.luna.ng-2.7.1.303.zip](../script.luna.ng/script.luna.ng-2.7.1.303.zip). Includes the matching Luna frontend, native Moonlight source with submodules, and the build/repackaging scripts.

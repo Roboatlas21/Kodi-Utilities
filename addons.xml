@@ -35,7 +35,7 @@
     <license>MIT</license>
     <minversion>21.0</minversion>
   </extension>
-</addon><addon id="script.luna.ng" name="Luna NG (CoreELEC 21 ARM32 test)" version="2.7.1.302" provider-name="Vortex, Roboatlas21">
+</addon><addon id="script.luna.ng" name="Luna NG (CoreELEC 21 ARM32 test)" version="2.7.1.303" provider-name="Vortex, Roboatlas21">
   <requires>
     <import addon="xbmc.python" version="3.0.0" />
   </requires>
