@@ -1,0 +1,32 @@
+{
+  "archives": {
+    "CoreELEC": {
+      "bytes": 22111248,
+      "parts": 3,
+      "sha256": "b5176d46dd450f17503c7760b0772fadcea1ef6374aa9bd2d403f2552dd345c4"
+    },
+    "FFmpeg": {
+      "bytes": 17679081,
+      "parts": 1,
+      "sha256": "32faba5ef67340d54724941eae1425580791195312a4fd13bf6f820a2818bf22"
+    },
+    "linux-amlogic": {
+      "bytes": 152271233,
+      "parts": 5,
+      "sha256": "9a945d00a3cefdf020ebe4071b87aa1aa8e4f8d08dd3b1ac977dbee93fb36372"
+    },
+    "media_modules-aml": {
+      "bytes": 1523165,
+      "parts": 1,
+      "sha256": "32a2ca9c1435e5ba70be6179f6dbe74e74fbac69b08d1a145f2f98520e55d868"
+    }
+  },
+  "pins": {
+    "CoreELEC": "872edca4dd5a7c5d6344e785d7358766834d7119",
+    "FFmpeg": "8.1.2",
+    "FFmpeg_sha256": "464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c",
+    "linux-amlogic": "2d0e0cc0db958d8d88f76407ac922f08d9a4004e",
+    "media_modules-aml": "47d0ec45bbc2d659d675e3a0269788be1470e1f7"
+  },
+  "schema": "luna-vfm-upstream-archives-v1"
+}

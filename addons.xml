@@ -35,7 +35,7 @@
     <license>MIT</license>
     <minversion>21.0</minversion>
   </extension>
-</addon><addon id="script.luna.ng" name="Luna NG (CoreELEC 21 ARM32 test)" version="2.7.1.308" provider-name="Vortex, Roboatlas21">
+</addon><addon id="script.luna.ng" name="Luna NG (CoreELEC 21 ARM32 test)" version="2.7.1.309" provider-name="Vortex, Roboatlas21">
   <requires>
     <import addon="xbmc.python" version="3.0.0" />
   </requires>
@@ -44,12 +44,14 @@
   </extension>
   <extension point="xbmc.addon.metadata">
     <platform>linux</platform>
+    <license>GPL-3.0-or-later</license>
+    <minversion>21.0</minversion>
     <language>en</language>
     <summary lang="en_GB">Moonlight Launcher for Kodi</summary>
-    <description lang="en_GB">Luna Moonlight streaming for CoreELEC 21 NG 32-bit ARM only. Experimental test build; not compatible with CoreELEC 22 NO ARM64.</description>
+    <description lang="en_GB">Luna is a Moonlight Launcher for Kodi. [CR]Use Luna to play games using Nvidia's GameStream protocol. [CR]Resume and quit sessions from Kodi</description>
     <assets>
       <icon>resources/icon.png</icon>
       <fanart>resources/fanart.jpg</fanart>
     </assets>
-  <license>GPL-3.0-or-later</license><minversion>21.0</minversion></extension>
+  </extension>
 </addon></addons>
