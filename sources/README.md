@@ -192,3 +192,10 @@ Experimental VFM: matching bridge/decoder modifications, FFmpeg patches and buil
 Corresponding source: [script.luna.ng-2.7.1.321-source.tar.gz](script.luna.ng-2.7.1.321-source.tar.gz). Add-on ZIP: [script.luna.ng-2.7.1.321.zip](../script.luna.ng/script.luna.ng-2.7.1.321.zip). Includes the matching Luna frontend, native Moonlight source with submodules, and the build/repackaging scripts.
 
 Experimental VFM: matching bridge/decoder modifications, FFmpeg patches and build recipes are in this corresponding-source archive. The pinned CoreELEC, linux-amlogic, media_modules-aml and FFmpeg upstream archives are at [upstream/](upstream/). Exact upstream revisions and checksums are recorded in `moonlight-embedded/packaging/coreelec-ng/vfm/sources.json` inside the source archive. Their public split-archive hashes are verified using `vfm-source-archives-sha256.json`.
+
+
+## Luna NG 2.7.1.327
+
+Corresponding source: [script.luna.ng-2.7.1.327-source.tar.gz](script.luna.ng-2.7.1.327-source.tar.gz). Add-on ZIP: [script.luna.ng-2.7.1.327.zip](../script.luna.ng/script.luna.ng-2.7.1.327.zip). Includes the matching Luna frontend, native Moonlight source with submodules, and the build/repackaging scripts.
+
+Experimental VFM: matching bridge/decoder modifications, FFmpeg patches and build recipes are in this corresponding-source archive. The pinned CoreELEC, linux-amlogic, media_modules-aml and FFmpeg upstream archives are at [upstream/](upstream/). Exact upstream revisions and checksums are recorded in `moonlight-embedded/packaging/coreelec-ng/vfm/sources.json` inside the source archive. Their public split-archive hashes are verified using `vfm-source-archives-sha256.json`.
