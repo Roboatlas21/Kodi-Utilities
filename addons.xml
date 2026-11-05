@@ -22,7 +22,7 @@
     <description lang="en_GB">Cinema Controls</description>
     <platform>all</platform><license>MIT</license><minversion>21.0</minversion>
   </extension>
-</addon><addon id="script.kodi.utilities.setup" name="Kodi Utilities - Device Setup" version="0.1.48" provider-name="Kodi Utilities">
+</addon><addon id="script.kodi.utilities.setup" name="Kodi Utilities - Device Setup" version="0.1.49" provider-name="Kodi Utilities">
   <requires>
     <import addon="xbmc.python" version="3.0.1" />
   </requires>
@@ -58,9 +58,9 @@
 </addon>
 <addon id="service.adaptive.letterbox.zoom" name="Adaptive Letterbox Zoom" version="0.1.2" provider-name="Roboatlas21">
   <requires>
-    <import addon="xbmc.python" version="3.0.1"/>
+    <import addon="xbmc.python" version="3.0.1" />
   </requires>
-  <extension point="xbmc.service" library="service.py"/>
+  <extension point="xbmc.service" library="service.py" />
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">Automatic letterbox zoom for CoreELEC P3I</summary>
     <description lang="en_GB">Reduce large letterbox bars using native video aspect ratio and supported Dolby Vision L5 metadata. Stop at the bars of a 2:1 picture on a 16:9 display or 115% zoom, whichever comes first. Requires the P3I info labels for Dolby Vision detection; SDR/HDR10 baked-in bars are not detected.</description>
