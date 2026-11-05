@@ -56,7 +56,7 @@
     </assets>
   </extension>
 </addon>
-<addon id="service.adaptive.letterbox.zoom" name="Adaptive Letterbox Zoom" version="0.1.1" provider-name="Roboatlas21">
+<addon id="service.adaptive.letterbox.zoom" name="Adaptive Letterbox Zoom" version="0.1.2" provider-name="Roboatlas21">
   <requires>
     <import addon="xbmc.python" version="3.0.1"/>
   </requires>
@@ -67,7 +67,7 @@
     <platform>all</platform>
     <license>MIT</license>
     <source>https://github.com/Roboatlas21/Adaptive-Letterbox-Zoom</source>
-    <news>Preserve small letterbox bars: stop at the 2:1 bar target or the configured maximum, up to 115%. Implements the v1.3 zoom-policy addendum. AM6B+ playback validation remains required.</news>
+    <news>Fix P3I AVChange storms repeatedly resetting L5 detection; recover from missed AVStarted; give manual zoom priority until the next movie or re-enable. Device validation remains required.</news>
   </extension>
 </addon>
 </addons>
